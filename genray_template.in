@@ -1,0 +1,199 @@
+&genr
+    mnemonic = 'template_name'
+    rayop = 'netcdf'
+    dielectric_op = 'enabled'
+    r0x = 1.0
+    b0 = 1.0
+    outdat = 'zrn.dat'
+    stat = 'new'
+    ixyz = 1
+/
+&tokamak
+    eqdskin = 'eqdsk'
+    eqdsktype = 'mirror'
+    indexrho = 4
+    ipsi = 1
+    ionetwo = 1
+    ieffic = 3
+    psifactr = 0.999
+    model_b = 0
+    nr = 201
+    nrgrid = 201
+    nzgrid = 1000
+    n_wall = 33
+    r_wall = 0.0275,0.0275,0.0325,0.1270,0.1270,0.2540,0.2540,0.3000,0.3000,
+                              0.2540,0.2540,0.3000,0.3000,0.2540,0.2540,0.1270,0.1270,0.0325, 
+                              0.0275,0.0275,-0.0275,-0.0275,-0.0325,-0.1270,-0.1270,-0.2540, 
+                              -0.2540,-0.1270,-0.1270,-0.0325,-0.0275,-0.0275,0.0275
+    z_wall = -1.238 , -0.865 , -0.83  , -0.83  , -0.7255, -0.7255, -0.6712,
+                              -0.6712, -0.3193, -0.3193,  0.3193,  0.3193,  0.6712,  0.6712,
+                              0.7255,  0.7255,  0.83  ,  0.83  ,  0.865 ,  1.238 ,  1.238 ,
+                              0.865 ,  0.83  ,  0.83  ,  0.7255,  0.7255, -0.7255,
+                              -0.7255, -0.83  , -0.83  , -0.865 , -1.238 , -1.238
+    h_add_wall = 0.001
+/
+&wave
+    frqncy = 110000000000.0
+    ioxm = -1
+    ioxm_n_npar = 0
+    ireflm = 1
+    jwave = 1
+    istart = 1
+    delpwrmn = 0.01
+    ibw = 0
+    i_vgr_ini = 1
+    poldist_mx = 10000.0  !was 100000
+    rho_reflect = 1.0
+    no_reflection = 0
+/
+&scatnper
+/
+&dispers
+    ib = 1
+    id = 2
+    iherm = 1
+    iabsorp = 1
+    iswitch = 0
+    idswitch = 2
+    iabswitch = 1
+    n_relt_harm = 5
+    n_relt_intgr = 50
+    iflux = 2
+    i_im_nperp = 1
+    i_geom_optic = 1
+    ray_direction = 1.0
+/
+&numercl
+    irkmeth = 2
+    ndim1 = 6
+    isolv = 1
+    idif = 1
+    nrelt = 3000
+    prmt1 = 0.0
+    prmt2 = 999900.0
+    prmt3 = 1.0e-04
+    prmt4 = 5.0e-04
+    prmt6 = 0.001
+    icorrect = 1
+    maxsteps_rk = 10000
+    i_uh_switch = 1
+    uh_switch = 1.5
+    prmt6_uh_switch = 0.0001
+    toll_hamilt = 0.1
+/
+&output
+    iwcntr = 0
+    iwopen = 1
+    iwj = 1
+    itools = 0
+    i_save_disp = 0
+    ixscan_save_disp = 300
+    xmin_save_disp = 0.0
+    xmax_save_disp = 0.31
+    y_save_disp = 0.0
+    z_save_disp = 0.0
+    inpar_save_disp = 5
+    inper_save_disp = 100
+    npar_mn_save_disp = 0.0
+    npar_mx_save_disp = 20.0
+    nper_mn_save_disp = 0.001
+    nper_mx_save_disp = 600.0
+/
+&plasma
+    ndens = 41
+    nbulk = 3
+    izeff = 2
+    idens = 0
+    model_rho_dens = 0
+/
+&species
+    charge = 1.0, 1.0, 1.0
+    dmas = 1.0, 3674.0, 3674.0
+/
+&varden
+/
+&denprof
+    dense0 = 0.6e+19, .3e+19, 0.3e+19
+    denseb = 0.6+19, .3e+19, 0.3e+19
+    rn1de = 3.2, 3.2, 3.2
+    rn2de = 1.2, 1.2, 1.2
+    zbegin_den_dropoff = 0.0,
+    zlength_den_dropoff = 0.0,
+/
+&tpopprof
+    tp0 = 1.0, 1.0, 1.0
+    tpb = 1.0, 1.0, 1.0
+    rn1tp = 2.0, 2.0, 2.0
+    rn2tp = 1.0, 1.0, 1.0
+/
+&vflprof
+/
+&zprof
+    zeff0 = 1.5
+    zeffb = 1.5
+    rn1zeff = 2.0
+    rn2zeff = 1.0
+/
+&tprof
+    ate0 = 1.2, 0.2, 25.0
+    ateb = 1.2, 0.2, 10.0
+    rn1te = 2.0, 2.0, 2.0
+    rn2te = 2.0, 2.0, 2.0
+/
+&grill
+    ilaunch = 1
+    r0launch = 0.055
+    z0launch = 0.4
+    phi0launch = 0.0
+    i_n_poloidal = 1
+    i_rho_cutoff = 0
+    ngrill = 1
+    igrillpw = 1
+    rhopsi0 = 0.91
+    thgrill = 0.0
+    phigrill = 0.0
+    height = 0.01
+    nthin = 1
+    anmin = -2.5
+    anmax = 2.5
+    nnkpar = 10
+    powers = 0.2e6
+/
+&eccone
+    raypatt = 'genray'
+    ncone = 1
+    powtot = 1000000.0
+    zst = 0.0
+    rst = 0.3
+    phist = 0.0
+    betast = -28.0
+    alfast = 180.0
+    alpha1 = 5.0
+    alpha2 = 0.0
+    na1 = 1
+    na2 = 10
+/
+&dentab
+/
+&temtab
+/
+&tpoptab
+/
+&vflowtab
+/
+&zeftab
+/
+&read_diskf
+    i_diskf = 0
+/
+&emission
+    wallr = 1
+/
+&ox
+    i_ox = 0
+    theta_bot = 0.0
+    theta_top = 0.0
+    i_ox_poloidal_max = 20
+    eps_antenna = 0.0001
+    eps_xe = 0.05
+/

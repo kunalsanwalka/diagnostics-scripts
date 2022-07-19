@@ -1,0 +1,5 @@
+$setup0
+noplots='enabled',
+ioutput=6
+lrz=10
+mnemonic='210604_also_a_test'
