@@ -73,7 +73,7 @@ filenameEqdsk='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/eqdsk/WHAM_Phase_2
 # betaArr,solrz,solzz=beta(filename,makeplot=True,saveplot=False)
 
 # Get the axial fusion neutron flux
-# fusArr,zArr=axial_neutron_flux(filename,makeplot=True,saveplot=True)
+fusArr,zArr=axial_neutron_flux(filename,makeplot=True,saveplot=True)
 
 #Get the radial fusion flux
 # rya,fusPower=radial_fusion_power(filename,makeplot=True,saveplot=True)

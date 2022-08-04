@@ -442,7 +442,7 @@ def abel_inversion(integratedSignalArr,closestApproachArr,makeplot=False,saveplo
         
         #Plot the radial profile
         ax1=ax.twinx()
-        sig2=ax1.plot(closestApproachArr,radialProfile,color='blue',label='Radial Profile')
+        sig2=ax1.plot(closestApproachArr,radialProfile,color='blue',label='Reconstructed Profile')
         ax1.set_ylabel(r'Reaction rate [s$^{-1}$]',color='blue')
         
         ax.set_xlabel(r'Radial Position [m]')
@@ -550,4 +550,47 @@ closestApproachArr=np.arange(0,1.5,0.1)
 integratedSignalArr=np.array([2,1.98997,1.95959,1.90788,1.83303,1.73205,1.6,1.42829,1.2,0.87178,0,0,0,0,0])
 
 #Perform the inverse abel transform
-radialProfile=abel_inversion(integratedSignalArr,closestApproachArr,makeplot=True,saveplot=True)
+radialProfile=abel.direct.direct_transform(integratedSignalArr,
+                                           r=closestApproachArr,
+                                           direction='inverse')
+    
+# =========================================================================
+# Plot the data
+# =========================================================================
+
+makeplot=True
+saveplot=True
+
+if makeplot==True:
+    
+    #Create the plot
+    fig=plt.figure(figsize=(12,8))
+    ax=fig.add_subplot(111)
+    
+    #Plot the integrated data
+    sig1=ax.plot(closestApproachArr,integratedSignalArr,color='red',label='Integrated Signal')
+    ax.set_ylabel(r'Integrated reaction rate [m/s]',color='red')
+    
+    #Plot the radial profile
+    ax1=ax.twinx()
+    sig2=ax1.plot(closestApproachArr,radialProfile,color='blue',label='Reconstructed Profile')
+    ax1.set_ylabel(r'Reaction rate [s$^{-1}$]',color='blue')
+    
+    #Plot the ideal radial profile
+    sig3=ax1.plot([0,1,1,1.4],[1,1,0,0],color='green',label='Ideal Profile')
+    
+    ax.set_xlabel(r'Radial Position [m]')
+    ax.set_title(r'Radial reaction rate profiles')
+    
+    sigs=sig1+sig2+sig3
+    names=[l.get_label() for l in sigs]
+    ax.legend(sigs,names,loc='lower left')
+    plt.show()
+    
+    if saveplot==True:
+        
+        #Generate the savename
+        savename='reconstructed_radial_profile.pdf'
+        
+        #Save the plot
+        plt.savefig(plotDest+savename,bbox_inches='tight')
