@@ -1,0 +1,11 @@
+# Ignore __pycache__ files (compiled python code)
+__pycache__/
+
+# Ignore jupyter notebook checkpoints (causes unnecessary merge conflicts)
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+
+# Mac metadata files
+.DS_Store
