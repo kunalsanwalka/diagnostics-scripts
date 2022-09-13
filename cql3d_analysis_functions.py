@@ -703,14 +703,12 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
     for ilr in range(0,lrz): #flux surfaces
         for ilz in range(0,lz): #z positions
             for ij in range(0,jx): #energy bins
-                for i in range(0,iy): #pitch angles
-                    icl=int(ilr/lrz*lrz)
-                    ithetahere=int(itheta[i,ilz,ilr])
-                    ndtotz[ilz,ilr]+=theta1[i]*xloc1[ij]*f[icl,ij,ithetahere]
-                    if ij>=jfast_mind:
-                        ndfz[ilz,ilr]+=theta1[i]*xloc1[ij]*f[icl,ij,ithetahere]
-                    else:
-                        ndwarmz[ilz,ilr]+=theta1[i]*xloc1[ij]*f[icl,ij,ithetahere]
+                ithetahere=itheta[:,ilz,ilr].astype(int)
+                ndtotz[ilz,ilr]+=np.sum(theta1*xloc1[ij]*f[ilr,ij,ithetahere])
+                if ij>=jfast_mind:
+                    ndfz[ilz,ilr]+=np.sum(theta1*xloc1[ij]*f[ilr,ij,ithetahere])
+                else:
+                    ndwarmz[ilz,ilr]+=np.sum(theta1*xloc1[ij]*f[ilr,ij,ithetahere])
     
     #Transpose the density arrays to match the indexing convention of Python. 
     #ndfz,ndwarmz and ndtotz use the same indexing convention as IDL. Since 
@@ -1813,7 +1811,7 @@ def fusion_rx_rate(filename,makeplot=False,saveplot=False):
         
         ax.set_xlabel('Time [ms]')
         ax.set_ylabel(r'Fusion Reaction Rate [s$^{-1}$]')
-        ax.set_ylim(1e10,np.max(sigftt)*2)
+        ax.set_ylim(np.max(sigftt)/1e6,np.max(sigftt)*2)
         ax.set_title('Fusion Reaction Rate')
         
         ax.grid(which='both')

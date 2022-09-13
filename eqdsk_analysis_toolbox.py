@@ -23,8 +23,8 @@ plotDest='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Plots/'
 
 def read_eqdsk(filename):
     """
-    This function was written by Ethan Peterson and it has ben copied here line
-    for line.
+    This function was written by Ethan Peterson and it has been copied here 
+    line for line.
     
     line 1 -- read grid information: title cursign, nnr, nnz, nnv
     line 2 -- read rbox,zbox,0,0,0

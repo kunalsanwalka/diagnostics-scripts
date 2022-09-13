@@ -43,7 +43,7 @@ from cql3d_analysis_functions import *
 #%% Analysis
 
 #Location of the CQL3D output
-filename=cql3dDest+'220627_genDens_5e13_Te_1000eV.nc'
+filename=cql3dDest+'220707_genDens_5e13_Te_1000eV.nc'
 
 #Location of the eqdsk
 filenameEqdsk='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/eqdsk/WHAM_Phase_2_eqdsk'
@@ -57,11 +57,16 @@ filenameEqdsk='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/eqdsk/WHAM_Phase_2
 #Get the distribution function data
 # distData,vPar,vPerp=dist_func(filename,makeplot=True,saveplot=True,fluxsurfplot=0,species=0,vMax=2e6)
 
+#Plot all distribution functions
+# plot_dist_funcs(filename,saveplot=True,species=0,vMax=2e6)
+
 #Get the derivatives of the distribution function
 # dist_func_derivatives(filename,makeplot=True)
 
 #Get the ion densities
 # ndwarmz,ndfz,ndtotz,solrz,solzz=ion_dens(filename,makeplot=True,saveplot=True,species=1)
+
+ndwarmz1,ndfz1,ndtotz1,solrz,solzz=ion_dens_new(filename,makeplot=True,saveplot=True,species=1)
 
 #Get the pressure profiles for a given species
 # pressparz_d,pressprpz_d,pressz_d,solrz,solzz=pressure(filename,makeplot=False,saveplot=False,savedata=False,species=0)
@@ -73,7 +78,7 @@ filenameEqdsk='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/eqdsk/WHAM_Phase_2
 # betaArr,solrz,solzz=beta(filename,makeplot=True,saveplot=False)
 
 # Get the axial fusion neutron flux
-fusArr,zArr=axial_neutron_flux(filename,makeplot=True,saveplot=True)
+# fusArr,zArr=axial_neutron_flux(filename,makeplot=True,saveplot=True)
 
 #Get the radial fusion flux
 # rya,fusPower=radial_fusion_power(filename,makeplot=True,saveplot=True)
@@ -102,7 +107,7 @@ fusArr,zArr=axial_neutron_flux(filename,makeplot=True,saveplot=True)
 #Get the average energy
 # rya,energyLastT=average_energy(filename,makeplot=True,saveplot=True)
 
-filenameFreya=cql3dDest+'freya_points_radProf.txt'
+# filenameFreya=cql3dDest+'freya_points_radProf.txt'
 
 #Get the NBI bith points
 # xArr,yArr,zArr,rArr,vxArr,vyArr,vzArr=nbi_birth_points(filenameFreya=filenameFreya,filenameEqdsk=filenameEqdsk,withFields=True,makeplot=True,saveplot=True)
@@ -112,9 +117,6 @@ filenameFreya=cql3dDest+'freya_points_radProf.txt'
 
 #Get the RF ray data
 # freq,delpwr,sdpwr,sbtot=ray_power_absorption(filename,makeplot=True,species=1)
-
-#Plot all distribution functions
-# plot_dist_funcs(filename,saveplot=True,species=0,vMax=2e6)
 
 #%% Run Scan (Setup)
 
@@ -129,18 +131,18 @@ filenameFreya=cql3dDest+'freya_points_radProf.txt'
 #              cql3dDest+'220321_pwr_400kW.nc',
 #              cql3dDest+'220321_pwr_500kW.nc']
 
-#Density scan
-filenameArr=[cql3dDest+'220321_dt_1e13.nc',
-             cql3dDest+'220321_dt_2e13.nc',
-             cql3dDest+'220321_dt_3e13.nc',
-             cql3dDest+'220321_dt_4e13.nc',
-             cql3dDest+'220321_dt_5e13.nc']
+# #Density scan
+# filenameArr=[cql3dDest+'220321_dt_1e13.nc',
+#              cql3dDest+'220321_dt_2e13.nc',
+#              cql3dDest+'220321_dt_3e13.nc',
+#              cql3dDest+'220321_dt_4e13.nc',
+#              cql3dDest+'220321_dt_5e13.nc']
 
-filenameArr=[cql3dDest+'220627_genDens_1e13_Te_1000eV.nc',
-             cql3dDest+'220627_genDens_2e13_Te_1000eV.nc',
-             cql3dDest+'220627_genDens_3e13_Te_1000eV.nc',
-             cql3dDest+'220627_genDens_4e13_Te_1000eV.nc',
-             cql3dDest+'220627_genDens_5e13_Te_1000eV.nc']
+# filenameArr=[cql3dDest+'220627_genDens_1e13_Te_1000eV.nc',
+#              cql3dDest+'220627_genDens_2e13_Te_1000eV.nc',
+#              cql3dDest+'220627_genDens_3e13_Te_1000eV.nc',
+#              cql3dDest+'220627_genDens_4e13_Te_1000eV.nc',
+#              cql3dDest+'220627_genDens_5e13_Te_1000eV.nc']
 
 #NBI Energy scan
 # filenameArr=[cql3dDest+'220428_only3rd_10keV.nc',
@@ -201,6 +203,12 @@ filenameArr=[cql3dDest+'220627_genDens_1e13_Te_1000eV.nc',
 #              cql3dDest+'220520_dens_5e12.nc',
 #              cql3dDest+'220520_dens_10e12.nc']
 
+filenameArr=[cql3dDest+'220912_noNBI_1ms.nc',
+             cql3dDest+'220912_noNBI_2ms.nc',
+             cql3dDest+'220912_noNBI_5ms.nc',
+             cql3dDest+'220912_noNBI_10ms.nc',
+             cql3dDest+'220912_noNBI_20ms.nc']
+
 # =============================================================================
 # Labels for each file
 # =============================================================================
@@ -233,7 +241,7 @@ filenameArr=[cql3dDest+'220627_genDens_1e13_Te_1000eV.nc',
 # paramArr=np.array([100,200,300,400,500])
 
 #Density Scan
-paramArr=np.array([1e13,2e13,3e13,4e13,5e13])
+# paramArr=np.array([1e13,2e13,3e13,4e13,5e13])
 
 #NBI Energy Scan
 # paramArr=np.array([10,15,25,35,45,55,65,75,85,95,105,115,125])
@@ -245,6 +253,7 @@ paramArr=np.array([1e13,2e13,3e13,4e13,5e13])
 # paramArr=np.array([10,20,30,40,50])
 # paramArr=np.array([1,2,5,10])
 # paramArr=np.array([9,10,11,12,13])
+paramArr=np.array([1,2,5,10,20])
 
 # =============================================================================
 # Plot name
@@ -254,7 +263,8 @@ paramArr=np.array([1e13,2e13,3e13,4e13,5e13])
 # plotName='WHAM_rf_pwrScan'
 # plotName='WHAM_nbi_pwrScan'
 # plotName='220428_nbi_energyScan_only3rd'
-plotName='220627_genDens_scan'
+# plotName='220627_genDens_scan'
+plotName='220912_noHeating'
 
 #Plot title
 # plotTitle='Background Density Scan'
@@ -262,15 +272,17 @@ plotName='220627_genDens_scan'
 # plotTitle='NBI Power Scan'
 # plotTitle='NBI Energy Scan'
 # plotTitle='Maxwellian Temperature Scan'
-plotTitle='General Density Scan'
+# plotTitle='General Density Scan'
+plotTitle=r'No Heating, WHAM 0.86T, $T_e$=1keV'
 
 #x-axis label
 # xAxLabel='RF Power [kW]'
 # xAxLabel='NBI Power [kW]'
-xAxLabel=r'Initial General Density (n$_i$) [cm$^{-3}$]'
+# xAxLabel=r'Initial General Density (n$_i$) [cm$^{-3}$]'
 # xAxLabel='NBI Energy [keV]'
 # xAxLabel=r'Density [$10^{x} cm^{-3}$]'
 # xAxLabel='Temperature [eV]'
+xAxLabel='Simulation Time [ms]'
 
 #Number of runs
 numRuns=len(filenameArr)
@@ -560,7 +572,8 @@ for i in range(0,numRuns):
     # ax.set_title(r'Maxwellian Density='+str(paramArr[i])+r'$\cdot 10^{12} cm^{-3}$')
     # ax.set_title(r'Maxwellian Temperature='+str(paramArr[i])+' eV')
     # ax.set_title(r'General Density= $10^{'+str(paramArr[i])+'} cm^{-3}$')
-    ax.set_title(r'General Density= '+str(paramArr[i]/1e13)+r'$\cdot 10^{13}$ cm$^{-3}$')
+    # ax.set_title(r'General Density= '+str(paramArr[i]/1e13)+r'$\cdot 10^{13}$ cm$^{-3}$')
+    ax.set_title(r'Time= '+str(paramArr[i])+'ms')
     
     ax.grid(True)
     
@@ -570,6 +583,41 @@ for i in range(0,numRuns):
 plt.savefig(plotDest+plotName+'_dist_func_fluxsurf_'+str(fluxSurf)+'.pdf',bbox_inches='tight')
 plt.close()
 # plt.show()
+
+#%% Scan- Maximum Density
+
+densArr=[]
+
+#Go over each file
+for i in range(len(filenameArr)):
+    
+    #Get the filename
+    filename=filenameArr[i]
+    
+    #Get the plasma densities
+    ndwarmz,ndfz,ndtotz,solrz,solzz=ion_dens(filename)
+    
+    #Find the maximum density
+    densMax=np.max(ndtotz)
+    
+    #Append to the array
+    densArr.append(densMax)
+    
+#Initialize the plot
+fig,ax=plt.subplots(figsize=(12,8))
+
+#Plot the data
+ax.plot(paramArr,densArr)
+
+#Add labels
+ax.set_xlabel(xAxLabel)
+ax.set_ylabel(r'Maximum Density [m$^{-3}$]')
+ax.set_title(plotTitle)
+
+ax.set_xlim(min(paramArr),max(paramArr))
+ax.grid(which='both')
+plt.show()
+plt.savefig(plotDest+plotName+'_maxDens_scan.pdf')
 
 #%% Contour- DD reaction rate
 
@@ -628,56 +676,56 @@ filenameArr=[[cql3dDest+'220627_genDens_1e13_Te_200eV.nc',
              cql3dDest+'220627_genDens_5e13_Te_1800eV.nc',
              cql3dDest+'220627_genDens_5e13_Te_2000eV.nc']]
 
-filenameArr=[[cql3dDest+'220707_genDens_1e13_Te_100eV.nc',
-             cql3dDest+'220707_genDens_1e13_Te_200eV.nc',
-             cql3dDest+'220707_genDens_1e13_Te_300eV.nc',
-             cql3dDest+'220707_genDens_1e13_Te_400eV.nc',
-             cql3dDest+'220707_genDens_1e13_Te_500eV.nc',
-             cql3dDest+'220707_genDens_1e13_Te_600eV.nc',
-             cql3dDest+'220707_genDens_1e13_Te_700eV.nc',
-             cql3dDest+'220707_genDens_1e13_Te_800eV.nc',
-             cql3dDest+'220707_genDens_1e13_Te_900eV.nc',
-             cql3dDest+'220707_genDens_1e13_Te_1000eV.nc'],
-             [cql3dDest+'220707_genDens_2e13_Te_100eV.nc',
-             cql3dDest+'220707_genDens_2e13_Te_200eV.nc',
-             cql3dDest+'220707_genDens_2e13_Te_300eV.nc',
-             cql3dDest+'220707_genDens_2e13_Te_400eV.nc',
-             cql3dDest+'220707_genDens_2e13_Te_500eV.nc',
-             cql3dDest+'220707_genDens_2e13_Te_600eV.nc',
-             cql3dDest+'220707_genDens_2e13_Te_700eV.nc',
-             cql3dDest+'220707_genDens_2e13_Te_800eV.nc',
-             cql3dDest+'220707_genDens_2e13_Te_900eV.nc',
-             cql3dDest+'220707_genDens_2e13_Te_1000eV.nc'],
-             [cql3dDest+'220707_genDens_3e13_Te_100eV.nc',
-             cql3dDest+'220707_genDens_3e13_Te_200eV.nc',
-             cql3dDest+'220707_genDens_3e13_Te_300eV.nc',
-             cql3dDest+'220707_genDens_3e13_Te_400eV.nc',
-             cql3dDest+'220707_genDens_3e13_Te_500eV.nc',
-             cql3dDest+'220707_genDens_3e13_Te_600eV.nc',
-             cql3dDest+'220707_genDens_3e13_Te_700eV.nc',
-             cql3dDest+'220707_genDens_3e13_Te_800eV.nc',
-             cql3dDest+'220707_genDens_3e13_Te_900eV.nc',
-             cql3dDest+'220707_genDens_3e13_Te_1000eV.nc'],
-             [cql3dDest+'220707_genDens_4e13_Te_100eV.nc',
-             cql3dDest+'220707_genDens_4e13_Te_200eV.nc',
-             cql3dDest+'220707_genDens_4e13_Te_300eV.nc',
-             cql3dDest+'220707_genDens_4e13_Te_400eV.nc',
-             cql3dDest+'220707_genDens_4e13_Te_500eV.nc',
-             cql3dDest+'220707_genDens_4e13_Te_600eV.nc',
-             cql3dDest+'220707_genDens_4e13_Te_700eV.nc',
-             cql3dDest+'220707_genDens_4e13_Te_800eV.nc',
-             cql3dDest+'220707_genDens_4e13_Te_900eV.nc',
-             cql3dDest+'220707_genDens_4e13_Te_1000eV.nc'],
-             [cql3dDest+'220707_genDens_5e13_Te_100eV.nc',
-             cql3dDest+'220707_genDens_5e13_Te_200eV.nc',
-             cql3dDest+'220707_genDens_5e13_Te_300eV.nc',
-             cql3dDest+'220707_genDens_5e13_Te_400eV.nc',
-             cql3dDest+'220707_genDens_5e13_Te_500eV.nc',
-             cql3dDest+'220707_genDens_5e13_Te_600eV.nc',
-             cql3dDest+'220707_genDens_5e13_Te_700eV.nc',
-             cql3dDest+'220707_genDens_5e13_Te_800eV.nc',
-             cql3dDest+'220707_genDens_5e13_Te_900eV.nc',
-             cql3dDest+'220707_genDens_5e13_Te_1000eV.nc']]
+# filenameArr=[[cql3dDest+'220707_genDens_1e13_Te_100eV.nc',
+#              cql3dDest+'220707_genDens_1e13_Te_200eV.nc',
+#              cql3dDest+'220707_genDens_1e13_Te_300eV.nc',
+#              cql3dDest+'220707_genDens_1e13_Te_400eV.nc',
+#              cql3dDest+'220707_genDens_1e13_Te_500eV.nc',
+#              cql3dDest+'220707_genDens_1e13_Te_600eV.nc',
+#              cql3dDest+'220707_genDens_1e13_Te_700eV.nc',
+#              cql3dDest+'220707_genDens_1e13_Te_800eV.nc',
+#              cql3dDest+'220707_genDens_1e13_Te_900eV.nc',
+#              cql3dDest+'220707_genDens_1e13_Te_1000eV.nc'],
+#              [cql3dDest+'220707_genDens_2e13_Te_100eV.nc',
+#              cql3dDest+'220707_genDens_2e13_Te_200eV.nc',
+#              cql3dDest+'220707_genDens_2e13_Te_300eV.nc',
+#              cql3dDest+'220707_genDens_2e13_Te_400eV.nc',
+#              cql3dDest+'220707_genDens_2e13_Te_500eV.nc',
+#              cql3dDest+'220707_genDens_2e13_Te_600eV.nc',
+#              cql3dDest+'220707_genDens_2e13_Te_700eV.nc',
+#              cql3dDest+'220707_genDens_2e13_Te_800eV.nc',
+#              cql3dDest+'220707_genDens_2e13_Te_900eV.nc',
+#              cql3dDest+'220707_genDens_2e13_Te_1000eV.nc'],
+#              [cql3dDest+'220707_genDens_3e13_Te_100eV.nc',
+#              cql3dDest+'220707_genDens_3e13_Te_200eV.nc',
+#              cql3dDest+'220707_genDens_3e13_Te_300eV.nc',
+#              cql3dDest+'220707_genDens_3e13_Te_400eV.nc',
+#              cql3dDest+'220707_genDens_3e13_Te_500eV.nc',
+#              cql3dDest+'220707_genDens_3e13_Te_600eV.nc',
+#              cql3dDest+'220707_genDens_3e13_Te_700eV.nc',
+#              cql3dDest+'220707_genDens_3e13_Te_800eV.nc',
+#              cql3dDest+'220707_genDens_3e13_Te_900eV.nc',
+#              cql3dDest+'220707_genDens_3e13_Te_1000eV.nc'],
+#              [cql3dDest+'220707_genDens_4e13_Te_100eV.nc',
+#              cql3dDest+'220707_genDens_4e13_Te_200eV.nc',
+#              cql3dDest+'220707_genDens_4e13_Te_300eV.nc',
+#              cql3dDest+'220707_genDens_4e13_Te_400eV.nc',
+#              cql3dDest+'220707_genDens_4e13_Te_500eV.nc',
+#              cql3dDest+'220707_genDens_4e13_Te_600eV.nc',
+#              cql3dDest+'220707_genDens_4e13_Te_700eV.nc',
+#              cql3dDest+'220707_genDens_4e13_Te_800eV.nc',
+#              cql3dDest+'220707_genDens_4e13_Te_900eV.nc',
+#              cql3dDest+'220707_genDens_4e13_Te_1000eV.nc'],
+#              [cql3dDest+'220707_genDens_5e13_Te_100eV.nc',
+#              cql3dDest+'220707_genDens_5e13_Te_200eV.nc',
+#              cql3dDest+'220707_genDens_5e13_Te_300eV.nc',
+#              cql3dDest+'220707_genDens_5e13_Te_400eV.nc',
+#              cql3dDest+'220707_genDens_5e13_Te_500eV.nc',
+#              cql3dDest+'220707_genDens_5e13_Te_600eV.nc',
+#              cql3dDest+'220707_genDens_5e13_Te_700eV.nc',
+#              cql3dDest+'220707_genDens_5e13_Te_800eV.nc',
+#              cql3dDest+'220707_genDens_5e13_Te_900eV.nc',
+#              cql3dDest+'220707_genDens_5e13_Te_1000eV.nc']]
 
 #Major axis
 majAx=np.array([1e13,2e13,3e13,4e13,5e13])

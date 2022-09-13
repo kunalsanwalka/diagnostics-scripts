@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #File location
-filename='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/CQL3D/220207_withNtor.nc'
+filename='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/CQL3D/220912_ambipolarHole.nc'
 
 #Open the file
 ds=nc.Dataset(filename)

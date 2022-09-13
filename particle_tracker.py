@@ -1945,7 +1945,7 @@ detPos=np.array([0.25,0,0.0]) #meters
 #Theta (angle wrt z axis)  ***DO NOT CHANGE***
 detTheta=(np.pi/180)*90 #radians
 #Phi (angle wrt x axis in the xy plane)
-detPhi=(np.pi/180)*(165) #radians
+detPhi=(np.pi/180)*(145) #radians
 
 #Size
 detSize=75*1e-6 #m^2
@@ -2406,7 +2406,7 @@ ncName=filenameEqdsk.split('/')[-1]
 savename=ncName+'_proton_detector_r_'+str(int(detPos[0]*100))+'cm_z_'+str(int(detPos[2]*100))+'cm_theta_'+str(int(detTheta*180/np.pi))+'deg_phi_'+str(int(detPhi*180/np.pi))+'deg_with_collimator.pdf'
 
 #Save the plot
-# plt.savefig(plotDest+savename,bbox_inches='tight')
+plt.savefig(plotDest+savename,bbox_inches='tight')
 
 plt.show()
 

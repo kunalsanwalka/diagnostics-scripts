@@ -701,7 +701,7 @@ def start_point(filename):
     
     return startPos
 
-def resonant_field_strengths(filename):
+def resonant_field_strengths(filename,species1,species2):
     """
     This function calculates the magentic field strength for the 1st 5
     harmonics of the D and T cyclotron frequency given the antenna frequency.
@@ -710,13 +710,17 @@ def resonant_field_strengths(filename):
     ----------
     filename : string
         Location of the Genray output file.
+    species1 : string
+        Tag for the ion species.
+    species2 : string
+        Tag for the ion species.
 
     Returns
     -------
-    BDArr : np.array
-        Deuterium |B| array.
-    BTArr : np.array
-        Tritium |B| array.
+    Bs1Arr : np.array
+        Species 1 |B| array.
+    Bs2Arr : np.array
+        Species 2 |B| array.
     """
     
     #Open the file
@@ -733,24 +737,34 @@ def resonant_field_strengths(filename):
     # Magnetic fields for resonances
     # =========================================================================
     
-    #Fundamental frequency field for D
-    B0D=2*np.pi*2*constants.m_p*freq/constants.e
+    #Fundamental frequency field for species1
+    if species1=='D':
+        B0s1=2*np.pi*2*constants.m_p*freq/constants.e
+    elif species1=='T':
+        B0s1=2*np.pi*3*constants.m_p*freq/constants.e
+    elif species1=='He3':
+        B0s1=2*np.pi*3*constants.m_p*freq/(2*constants.e)
     
-    #Fundamental frequency field for T
-    B0T=2*np.pi*3*constants.m_p*freq/constants.e
+    #Fundamental frequency field for species2
+    if species2=='D':
+        B0s2=2*np.pi*2*constants.m_p*freq/constants.e
+    elif species2=='T':
+        B0s2=2*np.pi*3*constants.m_p*freq/constants.e
+    elif species2=='He3':
+        B0s2=2*np.pi*3*constants.m_p*freq/(2*constants.e)
     
     #Array with the 1st 9 harmonics
-    BDArr=[]
-    BTArr=[]
+    Bs1Arr=[]
+    Bs2Arr=[]
     for i in reversed(range(1,8)): #range() does not include the last number
-        BDArr.append(B0D/i)
-        BTArr.append(B0T/i)
+        Bs1Arr.append(B0s1/i)
+        Bs2Arr.append(B0s2/i)
     
     #Convert to numpy
-    BDArr=np.array(BDArr)
-    BTArr=np.array(BTArr)
+    Bs1Arr=np.array(Bs1Arr)
+    Bs2Arr=np.array(Bs2Arr)
     
-    return BDArr,BTArr
+    return Bs1Arr,Bs2Arr
 
 def plot_power_in_ray_channel(filename,saveplot=False):
     """
@@ -833,7 +847,7 @@ def plot_power_in_ray_channel(filename,saveplot=False):
     
     return
 
-def plot_ray_path_with_B_flux_surfaces_XZ(filename,saveplot=False):
+def plot_ray_path_with_B_flux_surfaces_XZ(filename,species1='D',species2='T',saveplot=False):
     """
     This function plots the ray wavepaths and magnetic flux surfaces on the XZ
     Plane. It also highlights field strengths that are at the resonances for
@@ -843,6 +857,10 @@ def plot_ray_path_with_B_flux_surfaces_XZ(filename,saveplot=False):
     ----------
     filename : string
         Location of the Genray output file.
+    species1 : string
+        Tag for the ion species.
+    species2 : string
+        Tag for the ion species.
     saveplot : boolean
         Save the plot.
         
@@ -865,13 +883,31 @@ def plot_ray_path_with_B_flux_surfaces_XZ(filename,saveplot=False):
     Rmesh,Zmesh,Br,Bz,Bmag=magnetic_field_RZ(filename)
     
     #Get the resonance field values
-    BDArr,BTArr=resonant_field_strengths(filename)
+    BDArr,BTArr=resonant_field_strengths(filename,species1,species2)
     
     #Get the ray path data
     wr,wx,wy,wz,ws=ray_paths(filename)
     
     #Get the start position data
     startPos=start_point(filename)
+    
+    # =========================================================================
+    # Analysis
+    # =========================================================================
+    
+    if species1=='D':
+        label1='Deuterium'
+    elif species1=='T':
+        label1='Tritium'
+    elif species1=='He3':
+        label1='Helium-3'
+        
+    if species2=='D':
+        label2='Deuterium'
+    elif species2=='T':
+        label2='Tritium'
+    elif species2=='He3':
+        label2='Helium-3'
     
     # =========================================================================
     # Create the plot
@@ -912,6 +948,9 @@ def plot_ray_path_with_B_flux_surfaces_XZ(filename,saveplot=False):
     tCont=ax.contour(Zmesh,Rmesh,Bmag,levels=BTArr,colors='dodgerblue',linestyles='dashed',linewidths=3,zorder=10)
     ax.contour(Zmesh,-Rmesh,Bmag,levels=BTArr,colors='dodgerblue',linestyles='dashed',linewidths=3,zorder=10)
     
+    #Plot limits
+    ax.set_ylim(-0.2,0.2)
+    
     #Add labels for each contour
     DArrDict=dict()
     TArrDict=dict()
@@ -926,8 +965,11 @@ def plot_ray_path_with_B_flux_surfaces_XZ(filename,saveplot=False):
     # DLabelLocs=np.array([(-0.95,0.64),(-0.58,0.76)])
     # TLabelLocs=np.array([(-1.1,0.37),(-0.74,0.54),(-0.46,0.61),(0,0.67)])
     # #For WHAM
-    DLabelLocs=np.array([(-0.75,0.17),(-0.63,0.23),(-0.50,0.23),(-0.28,0.27)])
-    TLabelLocs=np.array([(-0.79,0.09),(-0.68,0.12),(-0.59,0.13),(-0.5,0.15)])
+    # DLabelLocs=np.array([(-0.75,0.17),(-0.63,0.23),(-0.50,0.23),(-0.28,0.27)])
+    # TLabelLocs=np.array([(-0.79,0.09),(-0.68,0.12),(-0.59,0.13),(-0.5,0.15)])
+    #For WHAM D-He3
+    DLabelLocs=np.array([(-0.72,0.103),(-0.56,0.115),(-0.44,0.136),(-0.01,0.147)])
+    TLabelLocs=np.array([(-0.69,0.15),(-0.50,0.14),(-0.11,0.15),(-0.5,0.15)])
         
     ax.clabel(dCont,fmt=DArrDict,manual=DLabelLocs)
     ax.clabel(tCont,fmt=TArrDict,manual=TLabelLocs)
@@ -947,7 +989,7 @@ def plot_ray_path_with_B_flux_surfaces_XZ(filename,saveplot=False):
     #Legend
     d1,_=dCont.legend_elements()
     t1,_=tCont.legend_elements()
-    ax.legend([d1[0],t1[0],startP],['Deuterium','Tritium','Start Point'],loc=[1.01,0.775])
+    ax.legend([d1[0],t1[0],startP],[label1,label2,'Start Point'],loc=[1.01,0.775])
     
     #Axes labels and plot title
     ax.set_xlabel('Z [m]')
@@ -1400,7 +1442,7 @@ def plot_field_along_flux_surfaces(filename,fluxValues,saveplot=False):
 #%% Analysis
 
 #Location of Genray output
-filename=genrayDest+'220510_onlyD_finitekPar.nc'
+filename=genrayDest+'220824_d3he.nc'
 
 #Get the netCDF4 data
 ds=nc.Dataset(filename)
@@ -1436,7 +1478,7 @@ ds=nc.Dataset(filename)
 # plot_power_in_ray_channel(filename,saveplot=True)
 
 #Plot the ray path with Psi_B on the XZ Plane
-plot_ray_path_with_B_flux_surfaces_XZ(filename,saveplot=True)
+plot_ray_path_with_B_flux_surfaces_XZ(filename,species1='D',species2='He3',saveplot=True)
 
 #Plot the ray path with n_e on the XZ Plane
 # plot_ray_path_with_e_dens_XZ(filename,saveplot=True)
