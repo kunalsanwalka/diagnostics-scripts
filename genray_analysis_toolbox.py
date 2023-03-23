@@ -330,7 +330,7 @@ def flux_surfaces(filename,makeplot=False,saveplot=False):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_flux_surfaces.pdf'
+        savename=ncName+'_flux_surfaces.png'
         
         fig=plt.figure(figsize=(21,8))
         ax=fig.add_subplot(111)
@@ -452,7 +452,7 @@ def field_along_flux_surface(filename,fluxValue,makeplot=False,saveplot=False):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_field_along_flux_surface_Psi_'+str(fluxValue)+'.pdf'
+        savename=ncName+'_field_along_flux_surface_Psi_'+str(fluxValue)+'.png'
         
         fig=plt.figure(figsize=(21,12))
         fig.suptitle(r'$\Psi_B$='+str(fluxValue)+' T/m$^2$')
@@ -798,7 +798,7 @@ def plot_power_in_ray_channel(filename,saveplot=False):
     ncName=filename.split('/')[-1]
     #Remove the .nc part
     ncName=ncName[0:-3]
-    savename=ncName+'_power_in_ray_channel.pdf'
+    savename=ncName+'_power_in_ray_channel.png'
     
     fig=plt.figure(figsize=(21,8))
     ax=fig.add_subplot(111)
@@ -918,7 +918,7 @@ def plot_ray_path_with_B_flux_surfaces_XZ(filename,species1='D',species2='T',sav
     ncName=filename.split('/')[-1]
     #Remove the .nc part
     ncName=ncName[0:-3]
-    savename=ncName+'_ray_path_with_B_field_strength_XZ.pdf'
+    savename=ncName+'_ray_path_with_B_field_strength_XZ.png'
     
     fig=plt.figure(figsize=(21,8))
     ax=fig.add_subplot(111)
@@ -933,6 +933,9 @@ def plot_ray_path_with_B_flux_surfaces_XZ(filename,species1='D',species2='T',sav
     PSImax=psilim+0.30*(psilim-psimag) #plot a few more surfaces than the LCFS
     #Plot levels
     levels=np.arange(PSImin,PSImax,(PSImax-PSImin)/50)
+    
+    print(PSImin)
+    print(PSImax)
     
     pltobj=ax.contour(Zmesh,Rmesh,eqdsk_psi,levels=levels)
     pltobj=ax.contour(Zmesh,-Rmesh,eqdsk_psi,levels=levels)
@@ -1086,7 +1089,7 @@ def plot_ray_path_with_e_dens_XZ(filename,saveplot=False):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_ray_path_with_e_dens_XZ.pdf'
+        savename=ncName+'_ray_path_with_e_dens_XZ.png'
         
         plt.savefig(plotDest+savename,bbox_inches='tight')
     
@@ -1160,7 +1163,7 @@ def plot_ray_path_XY(filename,saveplot=False):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_ray_path_XY.pdf'
+        savename=ncName+'_ray_path_XY.png'
         
         plt.savefig(plotDest+savename,bbox_inches='tight')
     
@@ -1211,7 +1214,7 @@ def plot_refractive_index_with_prop_distance(filename,saveplot=False):
     ncName=filename.split('/')[-1]
     #Remove the .nc part
     ncName=ncName[0:-3]
-    savename=ncName+'_ref_ind_with_prop_dist.pdf'
+    savename=ncName+'_ref_ind_with_prop_dist.png'
     
     #Initialize the plot
     fig,axs=plt.subplots(2,3,figsize=(35,15))
@@ -1431,7 +1434,7 @@ def plot_field_along_flux_surfaces(filename,fluxValues,saveplot=False):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_field_along_flux_surfaces.pdf'
+        savename=ncName+'_field_along_flux_surfaces.png'
         
         fig.savefig(plotDest+savename,bbox_inches='tight')
     
@@ -1442,7 +1445,7 @@ def plot_field_along_flux_surfaces(filename,fluxValues,saveplot=False):
 #%% Analysis
 
 #Location of Genray output
-filename=genrayDest+'220824_d3he.nc'
+filename=genrayDest+'220601_onlyD_morePoints.nc'
 
 #Get the netCDF4 data
 ds=nc.Dataset(filename)
@@ -1478,7 +1481,7 @@ ds=nc.Dataset(filename)
 # plot_power_in_ray_channel(filename,saveplot=True)
 
 #Plot the ray path with Psi_B on the XZ Plane
-plot_ray_path_with_B_flux_surfaces_XZ(filename,species1='D',species2='He3',saveplot=True)
+plot_ray_path_with_B_flux_surfaces_XZ(filename,species1='D',species2='T',saveplot=True)
 
 #Plot the ray path with n_e on the XZ Plane
 # plot_ray_path_with_e_dens_XZ(filename,saveplot=True)
@@ -1499,7 +1502,7 @@ plot_ray_path_with_B_flux_surfaces_XZ(filename,species1='D',species2='He3',savep
 # ncName=filename.split('/')[-1]
 # #Remove the .nc part
 # ncName=ncName[0:-3]
-# savename=ncName+'_ray_path_with_poloidal_flux_XZ.pdf'
+# savename=ncName+'_ray_path_with_poloidal_flux_XZ.png'
 
 # fig=plt.figure(figsize=(21,8))
 # ax=fig.add_subplot(111)

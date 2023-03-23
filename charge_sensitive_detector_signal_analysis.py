@@ -12,7 +12,7 @@ import abel
 import time
 import numpy as np
 import pandas as pd
-import scipy as sc
+import scipy.signal as signal
 import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size': 22})
 
@@ -197,14 +197,14 @@ def peak_timestamps(filename):
     timeArr,dataArr=open_data(filename)
     
     #Convolve the data with a gaussian
-    convData=sc.signal.convolve(dataArr,sc.signal.windows.gaussian(50,     #Width of gaussian (in number of data points)
+    convData=signal.convolve(dataArr,signal.windows.gaussian(50,     #Width of gaussian (in number of data points)
                                                                    10))    #Standard deviation
     
     #Differentiate the data to find the peaks
     diffData=np.diff(convData)
     
     #Find the peaks
-    peaks,prop=sc.signal.find_peaks(-diffData,prominence=400)
+    peaks,prop=signal.find_peaks(-diffData,prominence=400)
     
     #Remove peaks with index greater than length of timeArr (processing artifact)
     peaks=peaks[peaks<(len(timeArr)-1)]
@@ -481,14 +481,14 @@ filename=dataDest+'1e6_samples_2(1).bin'
 timeArr,dataArr=open_data(filename)
 
 #Convolve the data with a gaussian
-convData=sc.signal.convolve(dataArr,sc.signal.windows.gaussian(50,    #Width of gaussian (in number of data points)
+convData=signal.convolve(dataArr,signal.windows.gaussian(50,    #Width of gaussian (in number of data points)
                                                                10))    #Standard deviation
 
 #Differentiate the data to find the peaks
 diffData=np.diff(convData)
 
 #Find the peaks
-peaks,prop=sc.signal.find_peaks(-diffData,prominence=400)
+peaks,prop=signal.find_peaks(-diffData,prominence=400)
 
 #Remove peaks with index greater than length of timeArr (processing artifact)
 peaks=peaks[peaks<(len(timeArr)-1)]
@@ -514,6 +514,8 @@ ax.set_xlabel('Time [s]')
 ax.set_ylabel('Signal [arb. u.]')
 ax.set_title('Processed Signal')
 
+ax.set_xlim(0.001765,0.00179)
+
 ax.grid()
 plt.show()
 
@@ -526,6 +528,8 @@ ax.plot(timeArr,dataArr)
 ax.set_xlabel('Time [s]')
 ax.set_ylabel('Signal [arb. u.]')
 ax.set_title('Raw Signal')
+
+ax.set_xlim(0.001765,0.00179)
 
 ax.grid()
 plt.show()

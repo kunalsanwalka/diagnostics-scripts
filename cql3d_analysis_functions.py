@@ -344,9 +344,9 @@ def dist_func(filename,makeplot=False,saveplot=False,fluxsurfplot=0,species=0,vM
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_dist_func_fluxsurf_'+str(fluxsurfplot)+'.pdf'
+        savename=ncName+'_dist_func_fluxsurf_'+str(fluxsurfplot)+'.png'
         if multiSpecies:
-            savename=ncName+'_dist_func_fluxsurf_'+str(fluxsurfplot)+'_species_'+speciesLabels[species]+'.pdf'
+            savename=ncName+'_dist_func_fluxsurf_'+str(fluxsurfplot)+'_species_'+speciesLabels[species]+'.png'
         
         #Represent the r/a value in scientific notation
         ryaSciNot="{:.2e}".format(rya[fluxsurfplot])
@@ -361,15 +361,21 @@ def dist_func(filename,makeplot=False,saveplot=False,fluxsurfplot=0,species=0,vM
         #Create the plot
         fig=plt.figure(figsize=(21,8))
         ax=fig.add_subplot(111)
+        
         pltobj=ax.contourf(vPar[fluxsurfplot],vPerp[fluxsurfplot],logData,levels=np.linspace(minDist,maxDist,30))
-        ax.contour(pltobj,colors='black')
+        
         ax.set_xlabel(r'$v_{||}$ [m/s]')
         ax.set_xlim(-vMax,vMax)
-        ax.set_xticks(np.linspace(-vMax,vMax,17))
+        ax.set_xticks(np.linspace(-vMax,vMax,11))
+        
         ax.set_ylabel(r'$v_{\perp}$ [m/s]')
         ax.set_ylim(0,vMax)
+        ax.set_yticks(np.linspace(0,vMax,6))
+        
         ax.set_title('Distribution Function (r/a = '+ryaSciNot+')')
+        ax.contour(pltobj,colors='black')
         ax.grid(True)
+        
         cbar=fig.colorbar(pltobj)
         cbar.set_label(r'log$_{10}$(v$^{-3}$)')
         if saveplot==True:
@@ -442,9 +448,9 @@ def dist_func_derivatives(filename,makeplot=False,saveplot=False,fluxsurfplot=0,
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_dfdvperp_fluxsurf_'+str(fluxsurfplot)+'.pdf'
+        savename=ncName+'_dfdvperp_fluxsurf_'+str(fluxsurfplot)+'.png'
         if multiSpecies:
-            savename=ncName+'_dfdvperp_fluxsurf_'+str(fluxsurfplot)+'_species_'+speciesLabels[species]+'.pdf'
+            savename=ncName+'_dfdvperp_fluxsurf_'+str(fluxsurfplot)+'_species_'+speciesLabels[species]+'.png'
         
         #Represent the r/a value in scientific notation
         ryaSciNot="{:.2e}".format(rya[fluxsurfplot])
@@ -739,13 +745,13 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
         #Remove the .nc part
         ncName=ncName[0:-3]
         #Add suffix for all the plots
-        savenameFast=ncName+'_fast_ion_dens.pdf'
-        savenameTot=ncName+'_total_ion_dens.pdf'
-        savenameWarm=ncName+'_warm_ion_dens.pdf'
+        savenameFast=ncName+'_fast_ion_dens.png'
+        savenameTot=ncName+'_total_ion_dens.png'
+        savenameWarm=ncName+'_warm_ion_dens.png'
         if multiSpecies:
-            savenameFast=ncName+'_fast_ion_dens_species_'+speciesLabels[species]+'.pdf'
-            savenameTot=ncName+'_total_ion_dens_species_'+speciesLabels[species]+'.pdf'
-            savenameWarm=ncName+'_warm_ion_dens_species_'+speciesLabels[species]+'.pdf'
+            savenameFast=ncName+'_fast_ion_dens_species_'+speciesLabels[species]+'.png'
+            savenameTot=ncName+'_total_ion_dens_species_'+speciesLabels[species]+'.png'
+            savenameWarm=ncName+'_warm_ion_dens_species_'+speciesLabels[species]+'.png'
         
         #Normalize all plots with respect to each other
         maxDens=np.max(ndtotz)
@@ -760,7 +766,7 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
         ax1.contour(pltobj,colors='black')
         ax1.set_xlabel('Z [m]')
         ax1.set_ylabel('R [m]')
-        ax1.set_title('Fast Ion Density (>'+str(efastd)+'keV)')
+        ax1.set_title('Fast Ion Density (>'+str(efastd)+'keV); Species - '+speciesLabels[species])
         ax1.grid(True)
         cbar1=fig1.colorbar(pltobj)
         cbar1.set_label(r'Density [m$^{-3}$]')
@@ -778,7 +784,7 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
         ax2.contour(pltobj,colors='black')
         ax2.set_xlabel('Z [m]')
         ax2.set_ylabel('R [m]')
-        ax2.set_title('Warm Ion Density (<'+str(efastd)+'keV)')
+        ax2.set_title('Warm Ion Density (<'+str(efastd)+'keV); Species - '+speciesLabels[species])
         ax2.grid(True)
         cbar2=fig2.colorbar(pltobj)
         cbar2.set_label(r'Density [m$^{-3}$]')
@@ -796,7 +802,7 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
         ax3.contour(pltobj,colors='black')
         ax3.set_xlabel('Z [m]')
         ax3.set_ylabel('R [m]')
-        ax3.set_title('Total Ion Density')
+        ax3.set_title('Total Ion Density; Species - '+speciesLabels[species])
         ax3.grid(True)
         cbar3=fig3.colorbar(pltobj)
         cbar3.set_label(r'Density [m$^{-3}$]')
@@ -828,7 +834,7 @@ def warm_dens(filename,efastd=6,species=0):
         Overall warm plasma density.
     """
     
-    #TODO- fix warm density calcualtor. maybe there is a jacobian for the velocity
+    #TODO- fix warm density calculator. maybe there is a jacobian for the velocity
     
     #Open the file
     ds=nc.Dataset(filename)
@@ -930,6 +936,216 @@ def warm_dens(filename,efastd=6,species=0):
     
     return warmDens
     # return fSum,warmDens
+
+def radial_density_profile(filename,makeplot=False,saveplot=False):
+    """
+    This function calculates the radial density profile for all the general
+    species at z=0. The densities have units of m^{-3}.
+
+    Parameters
+    ----------
+    filename : string
+        Location of the CQl3D output file.
+    makeplot : boolean
+        Make a plot of the data.
+    saveplot : boolean
+        Save the plot.
+
+    Returns
+    -------
+    radArr : np.array
+        Radial coordinates where the density is calculated [m].
+    radDens : np.array
+        Radial density in m^{-3}. If there is more than 1 general species, the
+        1st index in this array is used to mark the species.
+    """
+    
+    #Open the file
+    ds=nc.Dataset(filename)
+    
+    # =========================================================================
+    # Get the raw data
+    # =========================================================================
+    
+    #Get the species labels
+    speciesLabels=species_labels(filename)
+    
+    #Number of general (whose distribution functions are evaluated) species
+    ngen=int(ds['ngen'][:])
+    
+    # =========================================================================
+    # Analysis
+    # =========================================================================
+    
+    #Array to store the radial coordinates
+    radArr=[]
+    
+    #Array to store the radial density profile
+    radDens=[]
+    
+    #Go over each species
+    for i in range(ngen):
+        
+        #Get the ion density data
+        ndwarmz,ndfz,ndtotz,solrz,solzz=ion_dens(filename,species=i)
+        
+        #Get the radial coordinates
+        radArr=solrz[:,0]
+        
+        #Get the radial density
+        radDensSpecies=ndtotz[:,0]
+        
+        #Append to the radDens array
+        radDens.append(radDensSpecies)
+        
+    #Convert to numpy array
+    radDens=np.array(radDens)
+    
+    # =========================================================================
+    # Plotting
+    # =========================================================================
+    
+    if makeplot==True:
+        
+        #Colors for species 1 and 2
+        colors=['red','blue']
+        
+        fig,ax=plt.subplots(figsize=(12,8))
+        
+        plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+        
+        ax.grid(True)
+        ax.set_title('Radial Density Profile')
+        ax.set_xlabel('Radius [m]')
+        ax.set_ylabel(r'Density [m$^{-3}$]')
+        
+        #Go over each species
+        if ngen>=2:
+            for i in range(ngen):
+                ax.plot(radArr,radDens[i],label=speciesLabels[i],color=colors[i])
+        else:
+            ax.plot(radArr,radDens[0],label=speciesLabels[0],color=colors[0])
+            
+        ax.legend(bbox_to_anchor=(1,1))
+        plt.show()
+        
+        if saveplot==True:
+            
+            #Generate the savename of the plot
+            #Get the name of the .nc file
+            ncName=filename.split('/')[-1]
+            #Remove the .nc part
+            ncName=ncName[0:-3]
+            savename=ncName+'_radial_density_profile.png'
+            
+            plt.savefig(plotDest+savename,bbox_inches='tight')
+    
+    return radArr,radDens[0]
+
+def axial_density_profile(filename,makeplot=False,saveplot=False):
+    """
+    This function calculates the axial density profile for all the general
+    species at the innermost flux surface. The densities have units of m^{-3}.
+
+    Parameters
+    ----------
+    filename : string
+        Location of the CQl3D output file.
+    makeplot : boolean
+        Make a plot of the data.
+    saveplot : boolean
+        Save the plot.
+
+    Returns
+    -------
+    axialArr : np.array
+        Axial coordinates where the density is calculated [m].
+    axialDens : np.array
+        Axial density in m^{-3}. If there is more than 1 general species, the
+        1st index in this array is used to mark the species.
+    """
+    
+    #Open the file
+    ds=nc.Dataset(filename)
+    
+    # =========================================================================
+    # Get the raw data
+    # =========================================================================
+    
+    #Get the species labels
+    speciesLabels=species_labels(filename)
+    
+    #Number of general (whose distribution functions are evaluated) species
+    ngen=int(ds['ngen'][:])
+    
+    # =========================================================================
+    # Analysis
+    # =========================================================================
+    
+    #Array to store the axial coordinates
+    axialArr=[]
+    
+    #Array to store the axial density profile
+    axialDens=[]
+    
+    #Go over each species
+    for i in range(ngen):
+        
+        #Get the ion density data
+        ndwarmz,ndfz,ndtotz,solrz,solzz=ion_dens(filename,species=i)
+        
+        #Get the axial coordinates
+        axialArr=solzz[0]
+        
+        #Get the axial density
+        axialDensSpecies=ndtotz[0]
+        
+        #Append to the radDens array
+        axialDens.append(axialDensSpecies)
+    
+    #Convert to numpy array
+    axialDens=np.array(axialDens)
+    
+    # =========================================================================
+    # Plotting
+    # =========================================================================
+    
+    if makeplot==True:
+        
+        #Colors for species 1 and 2
+        colors=['red','blue']
+        
+        fig,ax=plt.subplots(figsize=(12,8))
+        
+        plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
+        
+        ax.grid(True)
+        ax.set_title('Axial Density Profile')
+        ax.set_xlabel('Z [m]')
+        ax.set_ylabel(r'Density [m$^{-3}$]')
+        
+        #Go over each species
+        if ngen>=2:
+            for i in range(ngen):
+                ax.plot(axialArr,axialDens[i],label=speciesLabels[i],color=colors[i])
+        else:
+            ax.plot(axialArr,axialDens[0],label=speciesLabels[0],color=colors[0])
+            
+        ax.legend(bbox_to_anchor=(1,1))
+        plt.show()
+        
+        if saveplot==True:
+            
+            #Generate the savename of the plot
+            #Get the name of the .nc file
+            ncName=filename.split('/')[-1]
+            #Remove the .nc part
+            ncName=ncName[0:-3]
+            savename=ncName+'_axial_density_profile.png'
+            
+            plt.savefig(plotDest+savename,bbox_inches='tight')
+    
+    return axialArr,axialDens[0]
 
 def pressure(filename,makeplot=False,saveplot=False,savedata=False,species=0):
     """
@@ -1177,13 +1393,13 @@ def pressure(filename,makeplot=False,saveplot=False,savedata=False,species=0):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savenamePar=ncName+'_par_pressure.pdf'
-        savenamePerp=ncName+'_perp_pressure.pdf'
-        savenameTot=ncName+'_tot_pressure.pdf'
+        savenamePar=ncName+'_par_pressure.png'
+        savenamePerp=ncName+'_perp_pressure.png'
+        savenameTot=ncName+'_tot_pressure.png'
         if multiSpecies:
-            savenamePar=ncName+'_par_pressure_'+speciesLabels[species]+'.pdf'
-            savenamePerp=ncName+'_perp_pressure_'+speciesLabels[species]+'.pdf'
-            savenameTot=ncName+'_tot_pressure_'+speciesLabels[species]+'.pdf'
+            savenamePar=ncName+'_par_pressure_'+speciesLabels[species]+'.png'
+            savenamePerp=ncName+'_perp_pressure_'+speciesLabels[species]+'.png'
+            savenameTot=ncName+'_tot_pressure_'+speciesLabels[species]+'.png'
         
         #Normalize all plots with respect to each other
         maxPressure=np.max([np.max(pressz_d),np.max(pressparz_d),np.max(pressprpz_d)])
@@ -1341,9 +1557,9 @@ def total_pressure(filename,makeplot=False,saveplot=False,savedata=False):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savenamePar=ncName+'_par_pressure.pdf'
-        savenamePerp=ncName+'_perp_pressure.pdf'
-        savenameTot=ncName+'_tot_pressure.pdf'
+        savenamePar=ncName+'_par_pressure.png'
+        savenamePerp=ncName+'_perp_pressure.png'
+        savenameTot=ncName+'_tot_pressure.png'
         
         #Normalize all plots with respect to each other
         maxPressure=np.max([np.max(pressz),np.max(pressparz),np.max(pressprpz)])
@@ -1525,7 +1741,7 @@ def beta(filename,makeplot=False,saveplot=False):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_beta.pdf'
+        savename=ncName+'_beta.png'
         
         fig=plt.figure(figsize=(20,8))
         ax=fig.add_subplot(111)
@@ -1583,7 +1799,7 @@ def axial_neutron_flux(filename,makeplot=False,saveplot=False):
     # Convert to SI units
     # =========================================================================
     
-    #Convert the z array into meters
+    #Convert the z array to meters
     z_fus/=100
     
     # =========================================================================
@@ -1597,11 +1813,12 @@ def axial_neutron_flux(filename,makeplot=False,saveplot=False):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_fus_flux_axial_dependence.pdf'
+        savename=ncName+'_fus_flux_axial_dependence.png'
         
         fig=plt.figure(figsize=(15,8))
         ax=fig.add_subplot(111)
-        ax.plot(z_fus,flux_neutron_f)
+        ax.plot(z_fus,flux_neutron_f,linewidth=5)
+        ax.scatter(z_fus,flux_neutron_f,s=100)
         
         #Axes labels and sizes
         ax.set_xlabel('Z [m]')
@@ -1672,6 +1889,10 @@ def radial_fusion_power(filename,makeplot=False,saveplot=False):
     
     fusPower=np.array(fusPower)
     
+    # =========================================================================
+    # Plot the data
+    # =========================================================================
+    
     if makeplot==True:
         
         fig,ax=plt.subplots(figsize=(12,8))
@@ -1698,7 +1919,7 @@ def radial_fusion_power(filename,makeplot=False,saveplot=False):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_radial_fusion_power.pdf'
+            savename=ncName+'_radial_fusion_power.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
     
@@ -1796,7 +2017,7 @@ def fusion_rx_rate(filename,makeplot=False,saveplot=False):
         ncName=filename.split('/')[-1]
         #Remove the .nc part
         ncName=ncName[0:-3]
-        savename=ncName+'_fus_rx_rate.pdf'
+        savename=ncName+'_fus_rx_rate.png'
         
         fig=plt.figure(figsize=(8,8))
         ax=fig.add_subplot(111)
@@ -1926,7 +2147,7 @@ def source_power_dens(filename,makeplot=False,saveplot=False):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_source_power_density.pdf'
+            savename=ncName+'_source_power_density.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
     
@@ -2042,7 +2263,7 @@ def radial_q_profile(filename,makeplot=False,saveplot=False):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_radial_q_profile.pdf'
+            savename=ncName+'_radial_q_profile.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
     
@@ -2161,7 +2382,7 @@ def integrated_power_density(filename,makeplot=False,saveplot=False):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_integrated_power_density.pdf'
+            savename=ncName+'_integrated_power_density.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
         
@@ -2292,7 +2513,7 @@ def radial_input_power(filename,makeplot=False,saveplot=False):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_radial_input_power_profile.pdf'
+            savename=ncName+'_radial_input_power_profile.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
     
@@ -2420,7 +2641,7 @@ def integrated_power(filename,makeplot=False,saveplot=False):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_integrated_power.pdf'
+            savename=ncName+'_integrated_power.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
             
@@ -2537,16 +2758,112 @@ def fast_ion_confinement_time(filename,makeplot=False,saveplot=False,efastd=6):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_fast_ion_confinement_time.pdf'
+            savename=ncName+'_fast_ion_confinement_time.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
      
     return rya,tau_i
 
-def average_energy(filename,makeplot=False,saveplot=False):
+def average_energy(filename,species=0,makeplot=False,saveplot=False):
     """
     This function calculates the average energy of the ions as a function of
     the radius.
+
+    Parameters
+    ----------
+    filename : string
+        Location of the CQL3D output file.
+    species : int
+        Index of species.
+    makeplot : boolean
+        Make a plot of the data.
+    saveplot : boolean
+        Save the plot.
+
+    Returns
+    -------
+    rya : np.array
+        Normalized radius of the flux tube
+    time : np.array
+        Corresponding time array [s].
+    energyLastT : np.array
+        Average energy of the ion species [eV]. Dimensions - (ngen,time,rya)
+    """
+    
+    #Open the file
+    ds=nc.Dataset(filename)
+
+    # =========================================================================
+    # Get the raw data
+    # =========================================================================
+
+    #Energy per particle
+    energym=np.array(ds['energym'][:])*1000 #Convert to eV
+    
+    #Number of general (whose distribution functions are evaluated) species
+    ngen=int(ds['ngen'][:])
+    
+    #Corresponding time axis
+    time=np.array(ds['time'][:])
+    
+    #Normalized radius
+    rya=np.array(ds['rya'][:])
+    
+    #Array with the labels for each species
+    speciesLabels=species_labels(filename)
+    
+    # =========================================================================
+    # Analysis
+    # =========================================================================
+    
+    multiSpecies=False
+    
+    if ngen>1:
+        
+        multiSpecies=True
+        
+        #Get energym for the right species (else it has the wrong shape)
+        energym=energym[:,species,:]
+    
+    # =========================================================================
+    # Plotting
+    # =========================================================================
+    
+    if makeplot==True:
+        
+        fig,ax=plt.subplots(figsize=(12,8))
+
+        ax.set_title('Average Particle Energy; Species='+speciesLabels[species])
+        pltobj=ax.contourf(time*1000,rya,np.transpose(energym)/1000)
+        ax.contour(time*1000,rya,np.transpose(energym)/1000,colors='black')
+        
+        ax.grid(True)
+        ax.set_xlabel('Time [ms]')
+        ax.set_ylabel('Normalized Radius (r/a)')
+        ax.set_ylim(0,1)
+        
+        cbar=fig.colorbar(pltobj)
+        cbar.set_label(r'Energy [keV]')
+            
+        plt.show()
+        
+        if saveplot==True:
+            
+            #Generate the savename of the plot
+            #Get the name of the .nc file
+            ncName=filename.split('/')[-1]
+            #Remove the .nc part
+            ncName=ncName[0:-3]
+            savename=ncName+'_average_particle_energy_species_'+speciesLabels[species]+'.png'
+            
+            plt.savefig(plotDest+savename,bbox_inches='tight')
+    
+    return rya,time,energym
+
+def average_energy_final_timestep(filename,makeplot=False,saveplot=False):
+    """
+    This function calculates the average energy of the ions as a function of
+    the radius at the final timestep.
 
     Parameters
     ----------
@@ -2627,7 +2944,7 @@ def average_energy(filename,makeplot=False,saveplot=False):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_average_particle_energy.pdf'
+            savename=ncName+'_average_particle_energy_final_timestep.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
     
@@ -2734,12 +3051,16 @@ def nbi_birth_points(filenameFreya,filenameEqdsk='',withFields=False,makeplot=Fa
             #Get magnetic flux surface data
             Rmesh,Zmesh,eqdsk_psi=eqTools.flux_surfaces(filenameEqdsk)
             
+            #Plot levels
+            PSImin=0
+            PSImax=0.005710932333217801 #From genray plotting
+            levels=np.arange(PSImin,PSImax,(PSImax-PSImin)/50)
+            
             #Plot contours of the field
-            ax.contour(Zmesh,Rmesh,eqdsk_psi,levels=100)
-            pltObj=ax.contour(Zmesh,-Rmesh,eqdsk_psi,levels=100)
-            # ax.clabel(pltObj,inline=True,fontsize=20)
+            ax.contour(Zmesh,Rmesh,eqdsk_psi,levels=levels)
+            pltObj=ax.contour(Zmesh,-Rmesh,eqdsk_psi,levels=levels)
         
-        ax.scatter(zArr,xArr)
+        ax.scatter(zArr,xArr,zorder=10)
         
         ax.set_title('Initial Positions')
         ax.set_xlabel('Z [m]')
@@ -2760,12 +3081,16 @@ def nbi_birth_points(filenameFreya,filenameEqdsk='',withFields=False,makeplot=Fa
             #Get magnetic flux surface data
             Rmesh,Zmesh,eqdsk_psi=eqTools.flux_surfaces(filenameEqdsk)
             
+            #Plot levels
+            PSImin=0
+            PSImax=0.005710932333217801 #From genray plotting
+            levels=np.arange(PSImin,PSImax,(PSImax-PSImin)/50)
+            
             #Plot contours of the field
-            ax.contour(Zmesh,Rmesh,eqdsk_psi,levels=100)
-            pltObj=ax.contour(Zmesh,-Rmesh,eqdsk_psi,levels=100)
-            # ax.clabel(pltObj,inline=True,fontsize=20)
+            ax.contour(Zmesh,Rmesh,eqdsk_psi,levels=levels)
+            pltObj=ax.contour(Zmesh,-Rmesh,eqdsk_psi,levels=levels)
         
-        ax.scatter(zArr,yArr)
+        ax.scatter(zArr,yArr,zorder=10)
         
         ax.set_xlabel('Z [m]')
         ax.set_ylabel('Y [m]')
@@ -2839,7 +3164,7 @@ def nbi_birth_points(filenameFreya,filenameEqdsk='',withFields=False,makeplot=Fa
             ncName=filenameFreya.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_nbi_birth_points.pdf'
+            savename=ncName+'_nbi_birth_points.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
         
@@ -2914,6 +3239,9 @@ def nbi_bounce_field(filenameFreya,filenameEqdsk,makeplot=False,saveplot=False):
         ax.set_ylabel('Count')
     
         ax.hist(Binit,bins=30)
+        ax.set_xlim(0,np.max(Binit))
+        
+        ax.grid(True)
         
         ax=axs[1]
     
@@ -2921,6 +3249,9 @@ def nbi_bounce_field(filenameFreya,filenameEqdsk,makeplot=False,saveplot=False):
         ax.set_xlabel('Field Strength [T]')
     
         ax.hist(Bfinal,bins=30)
+        ax.set_xlim(0,np.max(Bfinal))
+        
+        ax.grid(True)
         
         if saveplot==True:
             
@@ -2929,7 +3260,7 @@ def nbi_bounce_field(filenameFreya,filenameEqdsk,makeplot=False,saveplot=False):
             ncName=filenameFreya.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_nbi_bounce_fields.pdf'
+            savename=ncName+'_nbi_bounce_fields.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
     
@@ -3092,7 +3423,7 @@ def ray_power_absorption(filename,makeplot=False,saveplot=False,species=0):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_genray_absorbtion.pdf'
+            savename=ncName+'_genray_absorbtion.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
         
@@ -3152,7 +3483,7 @@ def plot_dist_funcs(filename,saveplot=False,species=0,vMax=8e6):
     ncName=filename.split('/')[-1]
     #Remove the .nc part
     ncName=ncName[0:-3]
-    savename=ncName+'_dist_func_species_'+speciesLabels[species]+'.pdf'
+    savename=ncName+'_dist_func_species_'+speciesLabels[species]+'.png'
     
     #Initialize the plot
     fig,axs=plt.subplots(lrz,1,figsize=(21,lrz*9))

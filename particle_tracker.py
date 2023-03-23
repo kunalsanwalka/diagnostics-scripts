@@ -245,80 +245,6 @@ def initialize_particle(energy,theta,phi=0,species='D'):
     
     return velArr
 
-def single_particle_track(xIni,energy,theta,phi=0,species='H'):
-    """
-    This function tracks the motion of the particle through the magnetic field
-    as a function of the inital position and velocity.
-    
-    This is done with the help of the solve_ivp function from scipy. It is used
-    to solve an initial value problem for ODE's. The exact syntax of it is
-    complicated but it seems to be a 1 line affair. solve_ivp solves
-    differential equations of the form-
-    dy/dt=f(y,t)
-    
-    Orbit tracking is done by solving the Lorentz force equation in a magnetic
-    field-
-    a=(q/m)*(v x B)
-    
-    solve_ivp takes the Lorentz force equation written with velocities-
-    vdot=(q/m)*(v x B)
-    
-    This along with the initial position and velocity (inferred from the 
-    energy, theta and phi) gives the value of the state vector (position and 
-    velocity) at all times.
-
-    Parameters
-    ----------
-    xIni : np.array
-        Initial position of the particle.
-        Shape- xIni=[x0,y0,z0]
-    energy : float
-        Energy of the particle (eV).
-    theta : float
-        Angle with the z-axis (radians).
-    phi : float, optional
-        Angle with the x-axis (radians).
-        The default is 0.
-    species : string, optional
-        Species code. 
-        The default is 'H'.
-
-    Returns
-    -------
-    stateVec : np.array
-        State vector as a function of time (positions and velocities).
-        Shape- posArr[0]=x(t)
-               posArr[1]=y(t)
-               posArr[2]=z(t)
-               posArr[3]=vx(t)
-               posArr[4]=vy(t)
-               posArr[5]=vz(t)
-    """
-    
-    #Number of timesteps
-    timesteps=10000
-    
-    #Length of each timestep
-    steplength=1e-9 #seconds
-    
-    #Total time for the integration
-    totTime=timesteps*steplength
-    
-    #Get the initial velocity of the particle in cartesian coordinates
-    vIni=initialize_particle(energy,theta,phi=phi,species=species)
-    
-    #Initial conditions array
-    initCond=np.concatenate((xIni,vIni))
-    
-    #Solve the inital value problem for the position and velocity
-    stateVec=solve_ivp(fun=integrand,                           #f(y,t)
-                       t_span=(0,totTime),                      #Time domain over which we want the solution
-                       y0=initCond,                             #Initial conditions
-                       t_eval=np.linspace(0,totTime,timesteps), #Timesteps at which to save the state vector
-                       args=(species,))                         #Other arguments in 'integrand'
-    
-    return stateVec.y
-
 def integrand(t,y,species='D'):
     """
     This function is the integrand used by the solve_ivp function called in
@@ -398,6 +324,163 @@ def integrand(t,y,species='D'):
           qm*(vx*By-vy*Bx)] #az
     
     return dvdt
+
+def integrand_relativistic(t,y,species='D'):
+    """
+    This function is the integrand used by the solve_ivp function called in
+    single_particle_track. This is done as scipy already has a built in initial
+    value problem integrator which is more accurate than anything I can write.
+
+    Parameters
+    ----------
+    t : float
+        Time (s).
+    y : np.array
+        State vector (positions and velocities).
+        Shape- y[0]=x
+               y[1]=y
+               y[2]=z
+               y[3]=vx
+               y[4]=vy
+               y[5]=vz
+    species : string, optional
+        Species code. 
+        The default is 'D'.
+
+    Returns
+    -------
+    dvdt : np.array
+        dy/dt (velocity and acceleration).
+        Shape- dvdt[0]=vx
+               dvdt[1]=vy
+               dvdt[2]=vz
+               dvdt[3]=ax
+               dvdt[4]=ay
+               dvdt[5]=az
+    """
+    
+    #Positions
+    xPos=y[0]
+    yPos=y[1]
+    zPos=y[2]
+    
+    #Velocities
+    vx=y[3]
+    vy=y[4]
+    vz=y[5]
+    
+    #Convert x,y to cylindrical
+    r=np.sqrt(xPos**2+yPos**2)
+    theta=np.arctan2(yPos,xPos)
+    
+    #Try-except block since the particle can go beyond the range of the
+    #generated eqdsk. If this were to happen to a real particle it would have
+    #hit the wall anyway so just set v and a to 0.
+    try:
+        #Get Br and Bz at those points
+        Br=BrInterpolator([zPos,r])[0]
+        Bz=BzInterpolator([zPos,r])[0]
+        
+    except ValueError:
+        Br=0
+        Bz=0
+        vx=0
+        vy=0
+        vz=0
+    
+    #Convert Br to Bx and By
+    Bx=Br*np.cos(theta)
+    By=Br*np.sin(theta)
+    
+    #Charge to mass ratio
+    qm=charge_to_mass_ratio(species)
+    
+    #Gamma factor
+    gamma=1/np.sqrt(1-((vx**2+vy**2+vz**2)/const.c**2))
+    
+    #Calculate acceleration
+    dvdt=[vx,                       #vx
+          vy,                       #vy
+          vz,                       #vz
+          gamma*qm*(vy*Bz-vz*By),   #ax
+          gamma*qm*(vz*Bx-vx*Bz),   #ay
+          gamma*qm*(vx*By-vy*Bx)]   #az
+    
+    return dvdt
+
+def single_particle_track(xIni,energy,theta,phi=0,species='H'):
+    """
+    This function tracks the motion of the particle through the magnetic field
+    as a function of the inital position and velocity.
+    
+    This is done with the help of the solve_ivp function from scipy. It is used
+    to solve an initial value problem for ODE's. The exact syntax of it is
+    complicated but it seems to be a 1 line affair. solve_ivp solves
+    differential equations of the form-
+    dy/dt=f(y,t)
+    
+    Orbit tracking is done by solving the Lorentz force equation in a magnetic
+    field-
+    a=(q/m)*(v x B)
+    
+    solve_ivp takes the Lorentz force equation written with velocities-
+    vdot=(q/m)*(v x B)
+    
+    This along with the initial position and velocity (inferred from the 
+    energy, theta and phi) gives the value of the state vector (position and 
+    velocity) at all times.
+
+    Parameters
+    ----------
+    xIni : np.array
+        Initial position of the particle.
+        Shape- xIni=[x0,y0,z0]
+    energy : float
+        Energy of the particle (eV).
+    theta : float
+        Angle with the z-axis (radians).
+    phi : float, optional
+        Angle with the x-axis (radians).
+        The default is 0.
+    species : string, optional
+        Species code. 
+        The default is 'H'.
+
+    Returns
+    -------
+    stateVec : np.array
+        State vector as a function of time (positions and velocities).
+        Shape- posArr[0]=x(t)
+               posArr[1]=y(t)
+               posArr[2]=z(t)
+               posArr[3]=vx(t)
+               posArr[4]=vy(t)
+               posArr[5]=vz(t)
+    """
+    
+    #Number of timesteps
+    timesteps=10000
+    
+    #Length of each timestep
+    steplength=1e-9 #seconds
+    
+    #Total time for the integration
+    totTime=timesteps*steplength
+    
+    #Get the initial velocity of the particle in cartesian coordinates
+    vIni=initialize_particle(energy,theta,phi=phi,species=species)
+    
+    #Initial conditions array
+    initCond=np.concatenate((xIni,vIni))
+    
+    #Solve the inital value problem for the position and velocity
+    stateVec=solve_ivp(fun=integrand_relativistic,              #f(y,t)
+                       t_span=(0,totTime),                      #Time domain over which we want the solution
+                       y0=initCond,                             #Initial conditions
+                       t_eval=np.linspace(0,totTime,timesteps), #Timesteps at which to save the state vector
+                       args=(species,))                         #Other arguments in 'integrand'
+    
+    return stateVec.y
 
 def generate_tracks_eqdsk(filename,species='H',makeplot=False,saveplot=False):
     """
@@ -515,7 +598,7 @@ def generate_tracks_eqdsk(filename,species='H',makeplot=False,saveplot=False):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_fusion_particle_tracks.pdf'
+            savename=ncName+'_fusion_particle_tracks.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
         
@@ -645,7 +728,7 @@ def generate_tracks_cql3d_old(filename,species='H',makeplot=False,saveplot=False
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_fusion_particle_tracks.pdf'
+            savename=ncName+'_fusion_particle_tracks.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
         
@@ -769,7 +852,7 @@ def generate_tracks_cql3d(filename,species='H',makeplot=False,saveplot=False):
             ncName=filename.split('/')[-1]
             #Remove the .nc part
             ncName=ncName[0:-3]
-            savename=ncName+'_fusion_particle_tracks.pdf'
+            savename=ncName+'_fusion_particle_tracks.png'
             
             plt.savefig(plotDest+savename,bbox_inches='tight')
         
@@ -957,7 +1040,7 @@ def generate_tracks_detector(filename,detPos,detSize,detTheta,detPhi,
                 ncName=filename.split('/')[-1]
                 #Remove the .nc part
                 ncName=ncName[0:-3]
-                savename=ncName+'_launch_from_detector.pdf'
+                savename=ncName+'_launch_from_detector.png'
                 
                 plt.savefig(plotDest+savename,bbox_inches='tight')
         
@@ -1490,7 +1573,7 @@ def pad_array(arr):
     else:
         return np.array([a + [np.nan] * (M - len(a)) for a in arr])
 
-def plot_particle_tracks(particleTracks,endpoints=True,startpoints=True,detectorLoc=0,detectorVec=0,detectorArea=0,make3d=False,savename='temp.pdf',saveplot=False):
+def plot_particle_tracks(particleTracks,endpoints=True,startpoints=True,detectorLoc=0,detectorVec=0,detectorArea=0,make3d=False,savename='temp.png',saveplot=False):
     """
     This function plots a given set of particle tracks (defined in the variable
     'particleTracks') over a set of magnetic flux contours (defined in the 
@@ -1528,7 +1611,7 @@ def plot_particle_tracks(particleTracks,endpoints=True,startpoints=True,detector
     savename: string
         Name of the plot when saving. Format is- [eqdsk name]+savename.
         Note- Include filetype in savename.
-        Default value is 'temp.pdf'
+        Default value is 'temp.png'
     saveplot : boolean
         Save the plot. Only works when make3d is 'False'
 
@@ -1945,7 +2028,7 @@ detPos=np.array([0.25,0,0.0]) #meters
 #Theta (angle wrt z axis)  ***DO NOT CHANGE***
 detTheta=(np.pi/180)*90 #radians
 #Phi (angle wrt x axis in the xy plane)
-detPhi=(np.pi/180)*(145) #radians
+detPhi=(np.pi/180)*(150) #radians
 
 #Size
 detSize=75*1e-6 #m^2
@@ -2403,7 +2486,7 @@ for label,ax in axs.items():
 ncName=filenameEqdsk.split('/')[-1]
 
 #Generate the savename
-savename=ncName+'_proton_detector_r_'+str(int(detPos[0]*100))+'cm_z_'+str(int(detPos[2]*100))+'cm_theta_'+str(int(detTheta*180/np.pi))+'deg_phi_'+str(int(detPhi*180/np.pi))+'deg_with_collimator.pdf'
+savename=ncName+'_proton_detector_r_'+str(int(detPos[0]*100))+'cm_z_'+str(int(detPos[2]*100))+'cm_theta_'+str(int(detTheta*180/np.pi))+'deg_phi_'+str(int(detPhi*180/np.pi))+'deg_with_collimator.png'
 
 #Save the plot
 plt.savefig(plotDest+savename,bbox_inches='tight')
@@ -2470,10 +2553,10 @@ for i in range(len(particleTracks)):
 ncName=filenameEqdsk.split('/')[-1]
 
 #Savename for the plots
-# savename='_r_'+str(int(detPos[0]*100))+'cm.pdf'
-# savenameXY='_r_'+str(int(detPos[0]*100))+'cm_XY.pdf'
-# savename='_alpha2_'+str(int(alpha2*180/np.pi))+'deg.pdf'
-savename=ncName+'_proton_detector_r_'+str(int(detPos[0]*100))+'cm_z_'+str(int(detPos[2]*100))+'cm_theta_'+str(int(detTheta*180/np.pi))+'deg_phi_'+str(int(detPhi*180/np.pi))+'deg.pdf'
+# savename='_r_'+str(int(detPos[0]*100))+'cm.png'
+# savenameXY='_r_'+str(int(detPos[0]*100))+'cm_XY.png'
+# savename='_alpha2_'+str(int(alpha2*180/np.pi))+'deg.png'
+savename=ncName+'_proton_detector_r_'+str(int(detPos[0]*100))+'cm_z_'+str(int(detPos[2]*100))+'cm_theta_'+str(int(detTheta*180/np.pi))+'deg_phi_'+str(int(detPhi*180/np.pi))+'deg.png'
 
 #3D plot
 # plot_particle_tracks(coreTracks,endpoints=True,startpoints=True,detectorLoc=detPos,detectorVec=detNorm,detectorArea=detSize,make3d=True)
@@ -2766,7 +2849,7 @@ for i in range(len(particleTracks)):
 ncName=filename.split('/')[-1]
 #Remove the .nc part
 ncName=ncName[0:-3]
-savename=ncName+'_theta_'+str(np.round(detTheta))+'_phi_'+str(np.round(detPhi))+'.pdf'
+savename=ncName+'_theta_'+str(np.round(detTheta))+'_phi_'+str(np.round(detPhi))+'.png'
 #Plot the tracks that hit the detector
 plot_particle_tracks(contactTracks,detectorLoc=detPos,detectorVec=detNorm,detectorArea=detSize,savename='',saveplot=True)
                 

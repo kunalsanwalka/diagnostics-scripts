@@ -43,22 +43,22 @@ from cql3d_analysis_functions import *
 #%% Analysis
 
 #Location of the CQL3D output
-filename=cql3dDest+'220707_genDens_5e13_Te_1000eV.nc'
+filename=cql3dDest+'230222_newFusDiag.nc'
 
 #Location of the eqdsk
 filenameEqdsk='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/eqdsk/WHAM_Phase_2_eqdsk'
 
 #Get the netCDF4 data
-# ds=nc.Dataset(filename)
+ds=nc.Dataset(filename)
 
-#Get the 0D Parameters
-# zeroDParams=zero_d_parameters(filename,longParams=False)
+# Get the 0D Parameters
+# zeroDParams=zero_d_parameters(filename,longParams=True)
 
 #Get the distribution function data
-# distData,vPar,vPerp=dist_func(filename,makeplot=True,saveplot=True,fluxsurfplot=0,species=0,vMax=2e6)
+# distData,vPar,vPerp=dist_func(filename,makeplot=True,saveplot=True,fluxsurfplot=5,species=0,vMax=3e6)
 
 #Plot all distribution functions
-# plot_dist_funcs(filename,saveplot=True,species=0,vMax=2e6)
+# plot_dist_funcs(filename,saveplot=True,species=1,vMax=6e6)
 
 #Get the derivatives of the distribution function
 # dist_func_derivatives(filename,makeplot=True)
@@ -66,7 +66,11 @@ filenameEqdsk='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/eqdsk/WHAM_Phase_2
 #Get the ion densities
 # ndwarmz,ndfz,ndtotz,solrz,solzz=ion_dens(filename,makeplot=True,saveplot=True,species=1)
 
-ndwarmz1,ndfz1,ndtotz1,solrz,solzz=ion_dens_new(filename,makeplot=True,saveplot=True,species=1)
+#Get the radial density profile
+# radArr,radDens=radial_density_profile(filename,makeplot=True,saveplot=True)
+
+#Get the axial density profile
+# axialArr,axialDens=axial_density_profile(filename,makeplot=True,saveplot=True)
 
 #Get the pressure profiles for a given species
 # pressparz_d,pressprpz_d,pressz_d,solrz,solzz=pressure(filename,makeplot=False,saveplot=False,savedata=False,species=0)
@@ -78,7 +82,7 @@ ndwarmz1,ndfz1,ndtotz1,solrz,solzz=ion_dens_new(filename,makeplot=True,saveplot=
 # betaArr,solrz,solzz=beta(filename,makeplot=True,saveplot=False)
 
 # Get the axial fusion neutron flux
-# fusArr,zArr=axial_neutron_flux(filename,makeplot=True,saveplot=True)
+fusArr,zArr=axial_neutron_flux(filename,makeplot=True,saveplot=True)
 
 #Get the radial fusion flux
 # rya,fusPower=radial_fusion_power(filename,makeplot=True,saveplot=True)
@@ -86,16 +90,16 @@ ndwarmz1,ndfz1,ndtotz1,solrz,solzz=ion_dens_new(filename,makeplot=True,saveplot=
 # Get the fusion reaction rate 
 # fusrxrt,tArr=fusion_rx_rate(filename,makeplot=True,saveplot=True)
 
-#Get the source power density
-# rya,sorpw_nbi,sorpw_rf,sorpw_tot=source_power_dens(filename,makeplot=True,saveplot=True)
-
 #Get the radial Q_fus profile
 # rya,qFus=radial_q_profile(filename,makeplot=True,saveplot=True)
+
+#Get the radial input power density
+# rya,sorpw_nbi,sorpw_rf,sorpw_tot=source_power_dens(filename,makeplot=True,saveplot=True)
 
 #Get the radial integrated input power density
 # rya,sourceRate,integratedRF,totalIntegrated=integrated_power_density(filename,makeplot=True,saveplot=True)
 
-#Get the radial input power profile
+# Get the radial input power profile
 # rya,rfProfile,nbiProfile,totProfile=radial_input_power(filename,makeplot=True,saveplot=True)
 
 #Get the radial integrated input power profile
@@ -104,10 +108,13 @@ ndwarmz1,ndfz1,ndtotz1,solrz,solzz=ion_dens_new(filename,makeplot=True,saveplot=
 #Get the fast ion confinement time
 # rya,tau_i=fast_ion_confinement_time(filename,makeplot=True,saveplot=True)
 
-#Get the average energy
-# rya,energyLastT=average_energy(filename,makeplot=True,saveplot=True)
+# Get the average energy
+# rya,energyLastT=average_energy_final_timestep(filename,makeplot=True,saveplot=True)
 
-# filenameFreya=cql3dDest+'freya_points_radProf.txt'
+#Get the average energy time evolution
+# rya,time,avgEnergy=average_energy(filename,species=0,makeplot=True,saveplot=True)
+
+filenameFreya=cql3dDest+'freya_points_radProf.txt'
 
 #Get the NBI bith points
 # xArr,yArr,zArr,rArr,vxArr,vyArr,vzArr=nbi_birth_points(filenameFreya=filenameFreya,filenameEqdsk=filenameEqdsk,withFields=True,makeplot=True,saveplot=True)
@@ -737,7 +744,7 @@ minAx=np.array([100,200,300,400,500,600,700,800,900,1000])
 minAxName=r'T$_e$ [eV]'
 
 #NBI Power
-nbiPow=np.array([100e3,200e3,300e3,400e3,500e3])
+nbiPow=np.array([100e3,200e3,300e3,400e3,500e3]) #W
 
 #Plot savename
 plotSavename='dd_rx_rate_2d_param_scan_changing_NBI'
@@ -1662,8 +1669,89 @@ ax.grid(True)
 plt.savefig(plotDest+'rx_rate_maxTiScan.pdf',bbox_inches='tight')
 plt.close()
 
-#%% Scratch
+#%% Plots for paper (Get data)
 
-for filename in filenameArr:
-    
-    print(filename,warm_dens(filename,efastd=6))
+#With RF simulation
+filenameWithRF=cql3dDest+'230131_withRF2.nc'
+#Without RF simulation
+filenameWithoutRF=cql3dDest+'230207_withoutRF2.nc'
+
+#Plot savenames
+radSavename='radial_profiles.png'
+axialSavename='axial_profiles.png'
+
+# =============================================================================
+# Get the data
+# =============================================================================
+
+#Without RF
+
+#Get the radial density profile
+radArr,radDensWithoutRF=radial_density_profile(filenameWithoutRF)
+#Get the radial fusion flux
+rya,fusPowerWithoutRF=radial_fusion_power(filenameWithoutRF)
+
+#Get the axial density profile
+axialArrWithoutRF,axialDensWithoutRF=axial_density_profile(filenameWithoutRF)
+# Get the axial fusion neutron flux
+fusArrWithoutRF,zArr=axial_neutron_flux(filenameWithoutRF)
+
+#With RF
+
+#Get the radial density profile
+radArr,radDensWithRF=radial_density_profile(filenameWithRF)
+#Get the radial fusion flux
+rya,fusPowerWithRF=radial_fusion_power(filenameWithRF)
+
+#Get the axial density profile
+axialArrWithRF,axialDensWithRF=axial_density_profile(filenameWithRF)
+# Get the axial fusion neutron flux
+fusArrWithRF,zArr=axial_neutron_flux(filenameWithRF)
+
+# =============================================================================
+
+#%% Plots for paper (Plot data)
+
+#Plot the radial profiles
+fig,ax=plt.subplots(figsize=(16,8))
+
+ax.plot(rya,fusPowerWithoutRF[2]+fusPowerWithoutRF[3],label='Fusion Flux (no RF)', color='red', linewidth=3)
+ax.plot(rya,fusPowerWithRF[2]+fusPowerWithRF[3],label='Fusion Flux (with RF)', color='red', linestyle='dashed', linewidth=3)
+
+ax2=ax.twinx()
+
+ax2.plot(rya,radDensWithoutRF,label='Density (no RF)', color='blue', linewidth=3)
+ax2.plot(rya,radDensWithRF,label='Density (with RF)', color='blue', linestyle='dashed', linewidth=3)
+
+ax.set_xlabel('Normalized Radius')
+ax.set_xlim(0,1)
+ax.yaxis.set_ticks([])
+ax2.yaxis.set_ticks([])
+
+ax.legend(bbox_to_anchor=(1,1))
+ax2.legend(bbox_to_anchor=(0.955,0.82))
+
+plt.show()
+plt.savefig(plotDest+radSavename,bbox_inches='tight',dpi=300)
+
+#Plot the axial profiles
+fig,ax=plt.subplots(figsize=(16,8))
+
+ax.plot(zArr,fusArrWithoutRF,label='Fusion Flux (no RF)', color='red', linewidth=3)
+ax.plot(zArr,fusArrWithRF,label='Fusion Flux (with RF)', color='red', linestyle='dashed', linewidth=3)
+
+ax2=ax.twinx()
+
+ax2.plot(axialArrWithoutRF,axialDensWithoutRF,label='Density (no RF)', color='blue', linewidth=3)
+ax2.plot(axialArrWithRF,axialDensWithRF,label='Density (with RF)', color='blue', linestyle='dashed', linewidth=3)
+
+ax.set_xlabel('Z [m]')
+ax.set_xlim(0,1)
+ax.yaxis.set_ticks([])
+ax2.yaxis.set_ticks([])
+
+ax.legend(bbox_to_anchor=(1,1))
+ax2.legend(bbox_to_anchor=(0.955,0.82))
+
+plt.show()
+plt.savefig(plotDest+axialSavename,bbox_inches='tight',dpi=300)

@@ -998,7 +998,7 @@ def plot_flux_surfaces_with_resonances(filename,freq,saveplot=False):
 #%% Testbed
 
 #Location of the eqdsk
-filename='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/eqdsk/WHAM_Phase_2_eqdsk'
+filename='C:/Users/kunal/OneDrive - UW-Madison/WHAM/Data/eqdsk/WHAM_Phase_2_eqdsk_expander'
 
 #Antenna frequency
 freq=26e6 #MHz
@@ -1010,7 +1010,7 @@ freq=26e6 #MHz
 # Rmesh,Zmesh,Br,Bz,Bmag=magnetic_field_RZ(filename,makeplot=True,saveplot=False)
 
 # Get the flux surfaces
-# Rmesh,Zmesh,eqdsk_psi=flux_surfaces(filename,makeplot=True,saveplot=True)
+Rmesh,Zmesh,eqdsk_psi=flux_surfaces(filename,makeplot=True,saveplot=True)
 
 #Get the field along a given flux surface
 # zPosArr,rPosArr,Bflux=field_along_flux_surface(filename,0.1,makeplot=True,saveplot=True)
