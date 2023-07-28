@@ -9,3 +9,9 @@ profile_default/
 
 # Mac metadata files
 .DS_Store
+
+# Jax trace files
+jax-trace
+
+# Weird xlsx file (temp storage?)
+~$*.xlsx
