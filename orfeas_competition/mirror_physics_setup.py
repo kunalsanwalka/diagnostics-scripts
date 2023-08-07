@@ -216,7 +216,7 @@ tau_classical_plug = a_plug ** 2 * n_plug / (2 * D_classical_plug * 3 * n_plug)
 # ### Gyro-Bohm confinement time (plug)
 # Assuming density gradient is linear from 3x n_cc to 0
 D_B_plug = 1 / 16 * Te * 1e3 / B_p
-rho_plug = sympy.sqrt(2 * 3.343e-27 * const.elementary_charge * (3 / 2) * T_ic * 1e3) / (const.elementary_charge * B_p)
+rho_plug = sympy.sqrt(2 * 3.343e-27 * const.elementary_charge * (3 / 2) * Ti * 1e3) / (const.elementary_charge * B_p)
 rho_star_plug = rho_plug / a_plug
 tau_Bohm_plug = n_plug / (2 * D_B_plug * 3 * n_plug / a_plug)
 tau_gyroBohm_plug = n_plug / (2 * D_B_plug * 3 * n_plug / a_plug) / rho_star_plug * 10.0 # arbitrary
