@@ -17,3 +17,8 @@
 
 ## Performing scans over a parameter range
 Yet to be implemented -- I'll be doing this hopefully later today. 
+
+## Implementation overview
+The equations are implemented in [sympy](https://www.sympy.org/en/index.html): a symbolic math / computer algebra system for python. This module allows us to write equations analytically for evaluation later. It will also write out a quantity in LaTeX as a function of the fundamental quantities ('symbols') that are defined at the very beginning. I thought this would be a nice thing to have, but many interesting quantities — like total fusion power — end up looking like a total mess when all the symbols are substituted in (it may be worth gutting sympy from this and going for a pure jax implementation).
+
+This sympy code/graph can be translated to python code ('lambdify') using your numerical module of choice. In this case we use [jax](https://jax.readthedocs.io/en/latest/), which is a high-performance array computing library for python that creates, compiles (to XLA), and executes a computation graph. This graph allows us to compute gradients with respect to the input symbols very quickly which is required for optimization of multivariable equations.
