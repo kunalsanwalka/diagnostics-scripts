@@ -242,6 +242,7 @@ def dist_func(filename,makeplot=False,saveplot=False,fluxsurfplot=0,species=0,vM
     -------
     f : np.array
         Distribution function. 
+        Units- 1/(m^3*(m/s)^3)
         It has the form- f(flux surface,v_par,v_perp)
     vPar : np.array
         Parallel velocity (with respect to the magnetic field).
@@ -276,7 +277,7 @@ def dist_func(filename,makeplot=False,saveplot=False,fluxsurfplot=0,species=0,vM
     jx=int(ds['jx'][:])
     
     #Velocity normalization factor
-    vnorm=int(ds['vnorm'][:])
+    vnorm=float(ds['vnorm'][:])
     
     #Number of radial surface bins (=rdim)
     lrz=int(ds['lrz'][:])
@@ -333,6 +334,9 @@ def dist_func(filename,makeplot=False,saveplot=False,fluxsurfplot=0,species=0,vM
         #Get the f for the right species (else f has the wrong shape)
         f=f[species]
     
+    #Convert from CQL3D to SI units
+    f*=1e12/(vnorm**3)
+    
     # =========================================================================
     # Plot the data
     # =========================================================================
@@ -355,14 +359,14 @@ def dist_func(filename,makeplot=False,saveplot=False,fluxsurfplot=0,species=0,vM
         logData=np.log10(f[fluxsurfplot])
         
         #Maximum of the distribution
-        maxDist=np.max(logData)
+        maxDist=np.round(np.max(logData))
         minDist=maxDist-15
         
         #Create the plot
         fig=plt.figure(figsize=(21,8))
         ax=fig.add_subplot(111)
         
-        pltobj=ax.contourf(vPar[fluxsurfplot],vPerp[fluxsurfplot],logData,levels=np.linspace(minDist,maxDist,30))
+        pltobj=ax.contourf(vPar[fluxsurfplot],vPerp[fluxsurfplot],logData,levels=np.linspace(minDist,maxDist,31))
         
         ax.set_xlabel(r'$v_{||}$ [m/s]')
         ax.set_xlim(-vMax,vMax)
@@ -459,13 +463,13 @@ def dist_func_derivatives(filename,makeplot=False,saveplot=False,fluxsurfplot=0,
         logData=np.log10(f[fluxsurfplot])
         
         #Maximum of the distribution
-        maxDist=np.max(logData)
+        maxDist=np.round(np.max(logData))
         minDist=maxDist-15
         
         #Create the plot
         fig=plt.figure(figsize=(21,8))
         ax=fig.add_subplot(111)
-        pltobj=ax.contourf(vPar[fluxsurfplot],vPerp[fluxsurfplot],logData,levels=np.linspace(minDist,maxDist,30))
+        pltobj=ax.contourf(vPar[fluxsurfplot],vPerp[fluxsurfplot],logData,levels=np.linspace(minDist,maxDist,31))
         ax.contour(pltobj,colors='black')
         ax.set_xlabel(r'$v_{||}$ [m/s]')
         ax.set_xlim(-8e6,8e6)
@@ -482,7 +486,7 @@ def dist_func_derivatives(filename,makeplot=False,saveplot=False,fluxsurfplot=0,
     
     return
 
-def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
+def ion_dens(filename,makeplot=False,saveplot=False,savedata=False,efastd=6,species=0):
     """
     This function returns the ion densities along with the associated 
     coordinate arrays.
@@ -510,6 +514,8 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
         Make a plot of the data.
     saveplot : boolean
         Save the plot.
+    savedata : boolean
+        Save the data.
     efastd : float
         Boundary between warm and fast ions (keV).
     species : int
@@ -572,7 +578,7 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
     dx=np.array(ds['dx'][:])
     
     #Velocity normalization factor
-    vnorm=int(ds['vnorm'][:])
+    vnorm=float(ds['vnorm'][:])
     
     #Normalized magnetic field strength (B(z)/B(z=0))
     bbpsi=np.array(ds['bbpsi'][:])
@@ -590,7 +596,7 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
     #Remove all nan values (set them to 0)
     f=np.nan_to_num(f)
     
-    #Set all values at or below 0 to 10e-5 (helps with taking the log)
+    #Set all values at or below 0 to 1e-5 (helps with taking the log)
     f[f<=0]=1e-5
     
     # =========================================================================
@@ -705,14 +711,20 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
     #Minimum index
     jfast_mind=np.min(fastArr)
     
-    #Calculate the fast ion density
+    #Calculate the ion densities
     for ilr in range(0,lrz): #flux surfaces
         for ilz in range(0,lz): #z positions
             for ij in range(0,jx): #energy bins
                 ithetahere=itheta[:,ilz,ilr].astype(int)
+                
+                #Total ion density
                 ndtotz[ilz,ilr]+=np.sum(theta1*xloc1[ij]*f[ilr,ij,ithetahere])
+                
+                #Fast ion density
                 if ij>=jfast_mind:
                     ndfz[ilz,ilr]+=np.sum(theta1*xloc1[ij]*f[ilr,ij,ithetahere])
+                    
+                #Warm ion density
                 else:
                     ndwarmz[ilz,ilr]+=np.sum(theta1*xloc1[ij]*f[ilr,ij,ithetahere])
     
@@ -809,6 +821,29 @@ def ion_dens(filename,makeplot=False,saveplot=False,efastd=6,species=0):
         if saveplot==True:
             plt.savefig(plotDest+savenameTot,bbox_inches='tight')
         plt.show()
+        
+    # =========================================================================
+    # Save the data
+    # =========================================================================
+    
+    if savedata==True:
+        
+        #Generate the savename of the data
+        #Get the name of the .nc file
+        ncName=filename.split('/')[-1]
+        #Remove the .nc part
+        ncName=ncName[0:-3]
+        savenameWarm=ncName+'_warm_ion_density.npy'
+        savenameFast=ncName+'_fast_ion_density.npy'
+        savenameTot=ncName+'_total_ion_density.npy'
+        savenameR=ncName+'_r_grid.npy'
+        savenameZ=ncName+'_z_grid.npy'
+        
+        np.save(dataDest+savenameWarm,ndwarmz)
+        np.save(dataDest+savenameFast,ndfz)
+        np.save(dataDest+savenameTot,ndtotz)
+        np.save(dataDest+savenameR,solrz)
+        np.save(dataDest+savenameZ,solzz)
     
     return ndwarmz,ndfz,ndtotz,solrz,solzz
 
@@ -1229,7 +1264,7 @@ def pressure(filename,makeplot=False,saveplot=False,savedata=False,species=0):
     dx=np.array(ds['dx'][:])
     
     #Velocity normalization factor
-    vnorm=int(ds['vnorm'][:])
+    vnorm=float(ds['vnorm'][:])
     
     #Normalized magnetic field strength (B(z)/B(z=0))
     bbpsi=np.array(ds['bbpsi'][:])
@@ -1537,7 +1572,7 @@ def total_pressure(filename,makeplot=False,saveplot=False,savedata=False):
     
     #Use the standard function if there is only 1 species
     if ngen<=1:
-        return pressure(filename,makeplot=makeplot,saveplot=saveplot)
+        return pressure(filename,makeplot=makeplot,saveplot=saveplot,savedata=savedata)
     
     #Add the rest of the species
     for i in range(1,ngen):
@@ -1640,6 +1675,8 @@ def total_pressure(filename,makeplot=False,saveplot=False,savedata=False):
         np.save(dataDest+savenameTot,pressz)
         np.save(dataDest+savenameR,solrz)
         np.save(dataDest+savenameZ,solzz)
+        
+        print(dataDest+savenamePar)
         
     return pressparz,pressprpz,pressz,solrz,solzz
 
@@ -1757,6 +1794,49 @@ def beta(filename,makeplot=False,saveplot=False):
         plt.show()
     
     return beta_z,solrz,solzz
+
+def aic_growthrate(filename,makeplot=False,saveplot=False):
+    
+    #Get the plasma pressures
+    pressparz_d,pressprpz_d,pressz_d,solrz,solzz=pressure(filename)
+    
+    #Get the beta
+    beta_z,solrz,solzz=beta(filename)
+    
+    #Temperature anisotropy (same as pressure anisotropy)
+    tempAniso=pressprpz_d/pressparz_d
+    
+    #Calculate the AIC growthrate
+    gammaNorm=np.exp(-(1/beta_z)*((tempAniso-1)*(-2)))
+    
+    # =========================================================================
+    # Plot the data
+    # =========================================================================
+    
+    if makeplot==True:
+        
+        #Generate the savename of the plot
+        #Get the name of the .nc file
+        ncName=filename.split('/')[-1]
+        #Remove the .nc part
+        ncName=ncName[0:-3]
+        savename=ncName+'_aic_growthrate.png'
+        
+        fig=plt.figure(figsize=(20,8))
+        ax=fig.add_subplot(111)
+        pltobj=ax.contourf(solzz,solrz,gammaNorm,levels=50)
+        ax.contour(pltobj,colors='black')
+        ax.set_xlabel('Z [m]')
+        ax.set_ylabel('R [m]')
+        ax.set_title('Normalized AIC Growthrate')
+        ax.grid(True)
+        cbar=fig.colorbar(pltobj)
+        cbar.set_label(r'$\gamma / \Omega_{ci}$')
+        if saveplot==True:
+            plt.savefig(plotDest+savename,bbox_inches='tight')
+        plt.show()
+    
+    return gammaNorm,solrz,solzz
 
 def axial_neutron_flux(filename,makeplot=False,saveplot=False):
     """
@@ -3498,12 +3578,12 @@ def plot_dist_funcs(filename,saveplot=False,species=0,vMax=8e6):
         logData=np.log10(f[fluxsurfplot])
         
         #Maximum of the distribution
-        maxDist=np.max(logData)
+        maxDist=np.round(np.max(logData))
         minDist=maxDist-15
         
         #Create the plot
         ax=axs[fluxsurfplot]
-        pltobj=ax.contourf(vPar[fluxsurfplot],vPerp[fluxsurfplot],logData,levels=np.linspace(minDist,maxDist,30))
+        pltobj=ax.contourf(vPar[fluxsurfplot],vPerp[fluxsurfplot],logData,levels=np.linspace(minDist,maxDist,31))
         ax.contour(pltobj,colors='black')
         ax.set_xlabel(r'$v_{||}$ [m/s]')
         ax.set_xlim(-vMax,vMax)

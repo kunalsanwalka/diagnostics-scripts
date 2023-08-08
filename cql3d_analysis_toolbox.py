@@ -55,7 +55,7 @@ ds=nc.Dataset(filename)
 # zeroDParams=zero_d_parameters(filename,longParams=True)
 
 #Get the distribution function data
-# distData,vPar,vPerp=dist_func(filename,makeplot=True,saveplot=True,fluxsurfplot=5,species=0,vMax=3e6)
+# distData,vPar,vPerp=dist_func(filename,makeplot=True,saveplot=True,fluxsurfplot=0,species=0,vMax=4e6)
 
 #Plot all distribution functions
 # plot_dist_funcs(filename,saveplot=True,species=1,vMax=6e6)
@@ -64,7 +64,7 @@ ds=nc.Dataset(filename)
 # dist_func_derivatives(filename,makeplot=True)
 
 #Get the ion densities
-# ndwarmz,ndfz,ndtotz,solrz,solzz=ion_dens(filename,makeplot=True,saveplot=True,species=1)
+# ndwarmz,ndfz,ndtotz,solrz,solzz=ion_dens(filename,makeplot=True,saveplot=True,savedata=True,species=0)
 
 #Get the radial density profile
 # radArr,radDens=radial_density_profile(filename,makeplot=True,saveplot=True)
@@ -73,16 +73,19 @@ ds=nc.Dataset(filename)
 # axialArr,axialDens=axial_density_profile(filename,makeplot=True,saveplot=True)
 
 #Get the pressure profiles for a given species
-# pressparz_d,pressprpz_d,pressz_d,solrz,solzz=pressure(filename,makeplot=False,saveplot=False,savedata=False,species=0)
+# pressparz_d,pressprpz_d,pressz_d,solrz,solzz=pressure(filename,makeplot=True,saveplot=False,savedata=True,species=0)
 
 #Get the total pressure
 # pressparz,pressprpz,pressz,solrz,solzz=total_pressure(filename,makeplot=True,saveplot=True,savedata=True)
 
 #Get the plasma beta
-# betaArr,solrz,solzz=beta(filename,makeplot=True,saveplot=False)
+# betaArr,solrz,solzz=beta(filename,makeplot=True,saveplot=True)
+
+#Get the AIC growthrate
+# gammaNormArr,solrz,solzz=aic_growthrate(filename,makeplot=True,saveplot=True)
 
 # Get the axial fusion neutron flux
-fusArr,zArr=axial_neutron_flux(filename,makeplot=True,saveplot=True)
+# fusArr,zArr=axial_neutron_flux(filename,makeplot=True,saveplot=True)
 
 #Get the radial fusion flux
 # rya,fusPower=radial_fusion_power(filename,makeplot=True,saveplot=True)
@@ -807,7 +810,7 @@ rxRateArr=np.array(rxRateArr)
 adjRxRateArr=np.array(adjRxRateArr)
 maxBetaArr=np.array(maxBetaArr)
 
-#%%
+#%% Contour Plotting
 
 #Initialize the plot
 fig,ax=plt.subplots(figsize=(12,8))
